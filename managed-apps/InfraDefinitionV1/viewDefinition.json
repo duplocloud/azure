@@ -1,0 +1,132 @@
+{
+	"views": [
+		{
+			"kind": "Overview",
+			"properties": {
+				"header": "DuploCloud Infra",
+				"description": "Network components like Vnet , Subnet , NSG are managed here",
+				"commands": [
+					{
+						"displayName": "Ping Action",
+						"path": "/customping",
+						"icon": "LaunchCurrent"
+					}
+				]
+			}
+		},
+		{
+			"kind": "CustomResources",
+			"properties": {
+				"displayName": "Infrastructure",
+				"version": "1.0.0.0",
+				"resourceType": "Infrastructure",
+				"createUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters": 
+					{
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements":[
+									{
+										"name": "name",
+										"label": "Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									}
+								]
+							}
+						],
+						"outputs": {
+							"Name": "[steps('basic').name]"
+						}
+					}
+				},
+				"commands": [
+					{
+						"displayName": "Test",
+						"path": "Infrastructure/ProxyPost",
+						"icon": "Start"
+					}
+				],
+				"columns": [
+					{
+						"key": "properties.Name",
+						"displayName": "Name"
+					},
+					{
+						"key": "properties.Vnet.AddressPrefix",
+						"displayName": "AddressPrefix"
+					},
+					{
+						"key": "properties.ProvisioningStatus",
+						"displayName": "Status"
+					}
+				]
+			}
+		},
+		{
+			"kind": "CustomResources",
+			"properties": {
+				"displayName": "Subnet",
+				"version": "1.0.0.0",
+				"resourceType": "Subnet",
+				"createUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters": 
+					{
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements":[
+									{
+										"name": "name",
+										"label": "Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									}
+								]
+							}
+						],
+						"outputs": {
+							"Name": "[steps('basic').name]"
+						}
+					}
+				},
+				"commands": [
+					{
+						"displayName": "Test",
+						"path": "Subnet/ProxyPost",
+						"icon": "Start"
+					}
+				],
+				"columns": [
+					{
+						"key": "properties.NameEx",
+						"displayName": "Name"
+					},
+					{
+						"key": "properties.AddressPrefix",
+						"displayName": "AddressPrefix"
+					}
+				]
+			}
+		}
+	]
+}

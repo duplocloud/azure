@@ -1,0 +1,59 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+  "handler": "Microsoft.Azure.CreateUIDef",
+  "version": "0.1.2-preview",
+  "parameters":  {
+    "basics": [
+      {}
+    ],
+    "steps": [
+      {
+        "name": "infrastructureSettings",
+        "label": "Infrastructure Settings",
+        "subLabel": {
+          "preValidation": "Configure your Infrastructure settings",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "Infrastructure Settings",
+        "elements": [
+          {
+            "name": "vnetCidr",
+            "type": "Microsoft.Common.TextBox",
+            "label": "VNET CIDR",
+            "toolTip": "Name of the VNET CIDR",
+            "visible": true,
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "subnetName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Name of subnet",
+            "toolTip": "Name of subnet",
+            "visible": true,
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "subnetCidr",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Subnet Cidr",
+            "toolTip": "Subnet Cidr",
+            "visible": true,
+            "constraints": {
+              "required": true
+            }
+          }
+        ]
+      }
+    ],
+    "outputs": {
+      "subscriptionId": "[replace(subscription().id, '/subscriptions/', '')]",
+      "vnetCidr": "[steps('infrastructureSettings').vnetCidr]",
+      "subnetName": "[steps('infrastructureSettings').subnetName]",
+      "subnetCidr": "[steps('infrastructureSettings').subnetCidr]"
+    }
+  }
+}
