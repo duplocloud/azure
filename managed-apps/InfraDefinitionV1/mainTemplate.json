@@ -16,6 +16,20 @@
             "description": "The location for the resources."
         }
     },
+	"applicationResourceName": {
+          "type": "string",
+          "defaultValue": "",
+          "metadata": {
+              "description": "The application name."
+          }
+    },
+	"managedResourceGroupId": {
+          "type": "string",
+          "defaultValue": "",
+          "metadata": {
+              "description": "The managed RG ID."
+          }
+    },
     "vnetCidr": {
         "type": "string",
         "defaultValue": "",

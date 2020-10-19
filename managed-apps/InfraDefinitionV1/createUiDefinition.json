@@ -46,7 +46,7 @@
 									},
 									"columns": [
 										{
-											"id": "name",
+											"id": "NameEx",
 											"header": "Name",
 											"width": "0.20fr",
 											"element": {
@@ -64,7 +64,7 @@
 											}
 										},
 										{
-											"id": "address",
+											"id": "AddressPrefix",
 											"header": "Address Prefix",
 											"width": "0.20fr",
 											"element": {
@@ -76,7 +76,7 @@
 											}
 										},
 										{
-											"id": "type",
+											"id": "SubnetType",
 											"header": "Type",
 											"width": "0.20fr",
 											"element": {
@@ -111,30 +111,7 @@
 											}
 										},
 										{
-											"id": "isolated",
-											"header": "Isolated Network",
-											"width": "0.20fr",
-											"element": {
-												"name": "dropDown1",
-												"type": "Microsoft.Common.DropDown",
-												"placeholder": "Isolated Network",
-												"defaultValue": false,
-												"constraints": {
-													"allowedValues": [
-														{
-															"label": "No",
-															"value": false
-														},
-														{
-															"label": "Yes",
-															"value": true
-														}
-													]
-												}
-											}
-										},
-										{
-											"id": "svcemdpoimts",
+											"id": "ServiceEndpoints",
 											"header": "Service Endpoints",
 											"width": "0.20fr",
 											"element": {
