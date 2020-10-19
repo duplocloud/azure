@@ -116,7 +116,7 @@
                 "Subnets": "[parameters('Subnets')]"
             },
 			"LogAnalyticsConfig": {
-				"Name" : "[if(parameters('loganalyticsws'), parameters('applicationResourceName'), '')]"
+				"Name" : "[if(parameters('loganalyticsws'), 'default', '')]"
 			}
         }
     }
