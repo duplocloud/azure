@@ -1,59 +1,196 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
-  "handler": "Microsoft.Azure.CreateUIDef",
-  "version": "0.1.2-preview",
-  "parameters":  {
-    "basics": [
-      {}
-    ],
-    "steps": [
-      {
-        "name": "infrastructureSettings",
-        "label": "Infrastructure Settings",
-        "subLabel": {
-          "preValidation": "Configure your Infrastructure settings",
-          "postValidation": "Done"
-        },
-        "bladeTitle": "Infrastructure Settings",
-        "elements": [
-          {
-            "name": "vnetCidr",
-            "type": "Microsoft.Common.TextBox",
-            "label": "VNET CIDR",
-            "toolTip": "Name of the VNET CIDR",
-            "visible": true,
-            "constraints": {
-              "required": true
-            }
-          },
-          {
-            "name": "subnetName",
-            "type": "Microsoft.Common.TextBox",
-            "label": "Name of subnet",
-            "toolTip": "Name of subnet",
-            "visible": true,
-            "constraints": {
-              "required": true
-            }
-          },
-          {
-            "name": "subnetCidr",
-            "type": "Microsoft.Common.TextBox",
-            "label": "Subnet Cidr",
-            "toolTip": "Subnet Cidr",
-            "visible": true,
-            "constraints": {
-              "required": true
-            }
-          }
-        ]
-      }
-    ],
-    "outputs": {
-      "subscriptionId": "[replace(subscription().id, '/subscriptions/', '')]",
-      "vnetCidr": "[steps('infrastructureSettings').vnetCidr]",
-      "subnetName": "[steps('infrastructureSettings').subnetName]",
-      "subnetCidr": "[steps('infrastructureSettings').subnetCidr]"
-    }
-  }
+	"$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+	"handler": "Microsoft.Azure.CreateUIDef",
+	"version": "0.1.2-preview",
+	"parameters": {
+		"basics": [
+			{}
+		],
+		"steps": [
+			{
+				"name": "infrastructureSettings",
+				"label": "Infrastructure Settings",
+				"subLabel": {
+					"preValidation": "Configure your Infrastructure settings",
+					"postValidation": "Done"
+				},
+				"bladeTitle": "Infrastructure Settings",
+				"elements": [
+					{
+						"name": "vnetCidr",
+						"type": "Microsoft.Common.TextBox",
+						"label": "VNET CIDR",
+						"toolTip": "10.50.0.0/16",
+						"visible": true,
+						"constraints": {
+							"required": true
+						}
+					},
+					{
+						"name": "subnetSection",
+						"type": "Microsoft.Common.Section",
+						"label": "Subnets",
+						"elements": [
+							{
+								"name": "subnet",
+								"type": "Microsoft.Common.EditableGrid",
+								"ariaLabel": "Enter information per person",
+								"label": "Subnets",
+								"constraints": {
+									"width": "Full",
+									"rows": {
+										"count": {
+											"min": 1,
+											"max": 10
+										}
+									},
+									"columns": [
+										{
+											"id": "name",
+											"header": "Name",
+											"width": "0.20fr",
+											"element": {
+												"type": "Microsoft.Common.TextBox",
+												"placeholder": "Name of subnet",
+												"constraints": {
+													"required": true,
+													"validations": [
+														{
+															"regex": "^[a-z0-9A-Z]{1,30}$",
+															"message": "Only alphanumeric characters are allowed, and the value must be 1-30 characters long."
+														}
+													]
+												}
+											}
+										},
+										{
+											"id": "address",
+											"header": "Address Prefix",
+											"width": "0.20fr",
+											"element": {
+												"type": "Microsoft.Common.TextBox",
+												"placeholder": "10.50.1.0/24",
+												"constraints": {
+													"required": true
+												}
+											}
+										},
+										{
+											"id": "type",
+											"header": "Type",
+											"width": "0.20fr",
+											"element": {
+												"name": "dropDown1",
+												"type": "Microsoft.Common.DropDown",
+												"placeholder": "Subnet Type",
+												"defaultValue": "none",
+												"constraints": {
+													"allowedValues": [
+														{
+															"label": "None",
+															"value": "none"
+														},
+														{
+															"label": "Application Gateway",
+															"value": "appgateway"
+														},
+														{
+															"label": "Application Service Env",
+															"value": "appsevenv"
+														},
+														{
+															"label": "Managed Instance",
+															"value": "managedinstance"
+														},
+														{
+															"label": "Azure Bastion Subnet",
+															"value": "azurebastion"
+														}
+													]
+												}
+											}
+										},
+										{
+											"id": "isolated",
+											"header": "Isolated Network",
+											"width": "0.20fr",
+											"element": {
+												"name": "dropDown1",
+												"type": "Microsoft.Common.DropDown",
+												"placeholder": "Isolated Network",
+												"defaultValue": false,
+												"constraints": {
+													"allowedValues": [
+														{
+															"label": "No",
+															"value": false
+														},
+														{
+															"label": "Yes",
+															"value": true
+														}
+													]
+												}
+											}
+										},
+										{
+											"id": "svcemdpoimts",
+											"header": "Service Endpoints",
+											"width": "0.20fr",
+											"element": {
+												"name": "dropDown1",
+												"type": "Microsoft.Common.DropDown",
+												"placeholder": "Select a gender...",
+												"multiselect": true,
+												"constraints": {
+													"allowedValues": [
+														{
+															"label": "Microsoft.Storage",
+															"value": "Microsoft.Storage"
+														},
+														{
+															"label": "Microsoft.Sql",
+															"value": "Microsoft.Sql"
+														}
+													]
+												}
+											}
+										}
+									]
+								}
+							}	
+						],
+						"visible": true
+					},
+					{
+						"name": "loganalyticsws",
+						"type": "Microsoft.Common.DropDown",
+						"label": "Log Analytics Workspace",
+						"placeholder": "",
+						"toolTip": "[parameters('applicationResourceName')]",
+						"constraints": {
+							"allowedValues": [
+								{
+									"label": "No",
+									"value": false
+								},
+								{
+									"label": "Yes",
+									"value": true
+								}
+							],
+							"required": true
+						},
+						"visible": true
+					}
+				]
+			}
+		],
+		"outputs": {
+			"Accountid": "subscription().subscriptionId",
+			"AddressPrefix": "[steps('infrastructureSettings').vnetCidr]",
+			"Subnets": "[steps('infrastructureSettings').subnetSection.subnet]",
+			"loganalyticsws": "[steps('infrastructureSettings').loganalyticsws]",
+		}
+	}
 }

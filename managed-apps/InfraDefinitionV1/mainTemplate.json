@@ -112,12 +112,14 @@
         "properties": {
             "Cloud": 2,
             "Region": "[parameters('location')]",
-            "Accountid": "[parameters('subscriptionId')]",
+            "Accountid": "[parameters('Accountid')]",
             "Vnet": {
-                "AddressPrefix": "[parameters('vnetCidr')]",
-                "Subnets": [{ "AddressPrefix": "[parameters('subnetCidr')]", "NameEx": "[parameters('subnetName')]"  }],
-                "SecurityGroups": [{ "Name": "[parameters('subnetName')]", "Rules": [], "SubnetName": "[parameters('subnetName')]" }]
-            }
+                "AddressPrefix": "[parameters('AddressPrefix')]",
+                "Subnets": "[parameters('Subnets')]"
+            },
+			"LogAnalyticsConfig": {
+				"Name" : "[if(parameters('loganalyticsws'), parameters('applicationResourceName'), '')]"
+			}
         }
     }
 ],
