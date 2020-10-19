@@ -97,7 +97,7 @@
 														{
 															"label": "Application Service Env",
 															"value": "appsevenv"
-														},
+															},
 														{
 															"label": "Managed Instance",
 															"value": "managedinstance"
@@ -164,7 +164,7 @@
 			}
 		],
 		"outputs": {
-			"subscriptionId": "subscription().subscriptionId",
+			"subscriptionId": "[subscription().subscriptionId]",
 			"vnetCidr": "[steps('infrastructureSettings').vnetCidr]",
 			"Subnets": "[steps('infrastructureSettings').subnetSection.subnet]",
 			"loganalyticsws": "[steps('infrastructureSettings').loganalyticsws]"

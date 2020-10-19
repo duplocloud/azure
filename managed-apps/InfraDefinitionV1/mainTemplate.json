@@ -23,7 +23,7 @@
             "description": "The location for the resources."
         }
     },
-	"Subnets": {
+    "Subnets": {
 		"type": "array",
         "metadata": {
             "description": "Subnets config."
@@ -116,7 +116,7 @@
                 "Subnets": "[parameters('Subnets')]"
             },
 			"LogAnalyticsConfig": {
-				"Name" : "[if(parameters('loganalyticsws'), 'default', '')]"
+				"Name" : "default"
 			}
         }
     }
