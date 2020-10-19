@@ -1,140 +1,125 @@
 {
-  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-      "location": {
-          "type": "string",
-          "defaultValue": "eastus",
-          "metadata": {
-              "description": "The location for the resources."
-          }
-      },
-      "subscriptionId": {
-        "type": "string",
-        "defaultValue": "29474c73-cd93-48f0-80ee-9577a54e2227",
-        "metadata": {
-            "description": "The location for the resources."
-        }
-    },
-	"applicationResourceName": {
-          "type": "string",
-          "defaultValue": "",
-          "metadata": {
-              "description": "The application name."
-          }
-    },
-	"managedResourceGroupId": {
-          "type": "string",
-          "defaultValue": "",
-          "metadata": {
-              "description": "The managed RG ID."
-          }
-    },
-    "vnetCidr": {
-        "type": "string",
-        "defaultValue": "",
-        "metadata": {
-            "description": "The location for the resources."
-        }
-    },
-	"Subnets": {
-		"type": "array",
-        "metadata": {
-            "description": "Subnets config."
-        }
-	},
-	"loganalyticsws": {
-		"type": "bool",
-		"metadata": {
-            "description": "Property to enable LogAnalyticsConfig."
-        }
-	}
-  },
-  "resources": [
-    {
-        "apiVersion": "2018-09-01-preview",
-        "type": "Microsoft.CustomProviders/resourceProviders",
-        "name": "public",
-        "location": "[parameters('location')]",
-        "properties": {
-            "actions": [
-                {
-                    "name": "ProxyPost",
-                    "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRpAtRoot"
-                },
-                {
-                    "name": "VirtualMachines/ProxyPost",
-                    "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
-                }
-            ],
-            "resourceTypes": [
-                {
-                    "name": "Infrastructure",
-                    "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
-                },
-                {
-                    "name": "Subnet",
-                    "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
-                },
-                {
-                    "name": "NSGRule",
-                    "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
-                },
-                {
-                    "name": "VaultBackupPolicies",
-                    "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
-                },
-                {
-                    "name": "Images",
-                    "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
-                },
-                {
-                    "name": "Certificates",
-                    "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
-                },
-                {
-                    "name": "PlanConfigs",
-                    "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
-                },
-                {
-                    "name": "Tenant",
-                    "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
-                }
-            ]
-        }
-    },
-    {
-        "type": "Microsoft.CustomProviders/resourceProviders/Infrastructure",
-        "name": "public/passthroughnotused",
-        "apiVersion": "2018-09-01-preview",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-            "[resourceId('Microsoft.CustomProviders/resourceProviders', 'public')]"
-        ],
-        "properties": {
-            "Cloud": 2,
-            "Region": "[parameters('location')]",
-            "Accountid": "[parameters('subscriptionId')]",
-            "Vnet": {
-                "AddressPrefix": "[parameters('vnetCidr')]",
-                "Subnets": "[parameters('Subnets')]"
-            },
-			"LogAnalyticsConfig": {
-				"Name" : "[if(parameters('loganalyticsws'), parameters('applicationResourceName'), '')]"
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"location": {
+			"type": "string",
+			"defaultValue": "eastus",
+			"metadata": {
+				"description": "The location for the resources."
 			}
-        }
-    }
-],
-  "outputs": {
-  }
+		},
+		"subscriptionId": {
+			"type": "string",
+			"defaultValue": "29474c73-cd93-48f0-80ee-9577a54e2227",
+			"metadata": {
+				"description": "The location for the resources."
+			}
+		},
+		"vnetCidr": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "The location for the resources."
+			}
+		},
+		"Subnets": {
+			"type": "array",
+			"metadata": {
+				"description": "Subnets config."
+			}
+		},
+		"loganalyticsws": {
+			"type": "bool",
+			"metadata": {
+				"description": "Property to enable LogAnalyticsConfig."
+			}
+		}
+	},
+	"resources": [
+		{
+			"apiVersion": "2018-09-01-preview",
+			"type": "Microsoft.CustomProviders/resourceProviders",
+			"name": "public",
+			"location": "[parameters('location')]",
+			"properties": {
+				"actions": [
+					{
+						"name": "ProxyPost",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRpAtRoot"
+					},
+					{
+						"name": "VirtualMachines/ProxyPost",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+					}
+				],
+				"resourceTypes": [
+					{
+						"name": "Infrastructure",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+					},
+					{
+						"name": "Subnet",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+					},
+					{
+						"name": "NSGRule",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+					},
+					{
+						"name": "VaultBackupPolicies",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+					},
+					{
+						"name": "Images",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+					},
+					{
+						"name": "Certificates",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+					},
+					{
+						"name": "PlanConfigs",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+					},
+					{
+						"name": "Tenant",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+					}
+				]
+			}
+		},
+		{
+			"type": "Microsoft.CustomProviders/resourceProviders/Infrastructure",
+			"name": "public/passthroughnotused",
+			"apiVersion": "2018-09-01-preview",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.CustomProviders/resourceProviders', 'public')]"
+			],
+			"properties": {
+				"Cloud": 2,
+				"Region": "[parameters('location')]",
+				"Accountid": "[parameters('subscriptionId')]",
+				"Vnet": {
+					"AddressPrefix": "[parameters('vnetCidr')]",
+					"Subnets": "[parameters('Subnets')]"
+				},
+				"LogAnalyticsConfig": {
+					"Name": "[if(parameters('loganalyticsws'), parameters('applicationResourceName'), '')]"
+				}
+			}
+		}
+	],
+	"outputs": {}
 }
