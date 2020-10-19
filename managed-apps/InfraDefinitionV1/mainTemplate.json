@@ -23,20 +23,18 @@
             "description": "The location for the resources."
         }
     },
-    "subnetName": {
-        "type": "string",
-        "defaultValue": "default",
+	"Subnets": {
+		"type": "array",
         "metadata": {
-            "description": "The location for the resources."
+            "description": "Subnets config."
         }
-    },
-    "subnetCidr": {
-        "type": "string",
-        "defaultValue": "",
-        "metadata": {
-            "description": "The location for the resources."
+	},
+	"loganalyticsws": {
+		"type": "bool",
+		"metadata": {
+            "description": "Property to enable LogAnalyticsConfig."
         }
-    }
+	}
   },
   "resources": [
     {
@@ -112,9 +110,9 @@
         "properties": {
             "Cloud": 2,
             "Region": "[parameters('location')]",
-            "Accountid": "[parameters('Accountid')]",
+            "Accountid": "[parameters('subscriptionId')]",
             "Vnet": {
-                "AddressPrefix": "[parameters('AddressPrefix')]",
+                "AddressPrefix": "[parameters('vnetCidr')]",
                 "Subnets": "[parameters('Subnets')]"
             },
 			"LogAnalyticsConfig": {

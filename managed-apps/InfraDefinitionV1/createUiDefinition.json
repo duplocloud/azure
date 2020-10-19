@@ -187,8 +187,8 @@
 			}
 		],
 		"outputs": {
-			"Accountid": "subscription().subscriptionId",
-			"AddressPrefix": "[steps('infrastructureSettings').vnetCidr]",
+			"subscriptionId": "subscription().subscriptionId",
+			"vnetCidr": "[steps('infrastructureSettings').vnetCidr]",
 			"Subnets": "[steps('infrastructureSettings').subnetSection.subnet]",
 			"loganalyticsws": "[steps('infrastructureSettings').loganalyticsws]"
 		}
