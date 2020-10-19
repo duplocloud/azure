@@ -190,7 +190,7 @@
 			"Accountid": "subscription().subscriptionId",
 			"AddressPrefix": "[steps('infrastructureSettings').vnetCidr]",
 			"Subnets": "[steps('infrastructureSettings').subnetSection.subnet]",
-			"loganalyticsws": "[steps('infrastructureSettings').loganalyticsws]",
+			"loganalyticsws": "[steps('infrastructureSettings').loganalyticsws]"
 		}
 	}
 }
