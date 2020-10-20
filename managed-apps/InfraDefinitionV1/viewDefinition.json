@@ -127,6 +127,459 @@
 					}
 				]
 			}
+		},
+		{
+			"kind": "CustomResources",
+			"properties": {
+				"displayName": "NSG Rules",
+				"version": "1.0.0.0",
+				"resourceType": "NSGRule",
+				"createUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters":
+					{
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements":[
+									{
+										"name": "subscriptionsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "GET",
+											"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
+										}
+									},
+									{
+										"name": "subscriptionDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Subscriptions",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "resourceGroupsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "GET",
+											"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
+										}
+									},
+									{
+										"name": "resourceGroupDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Managed App",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duploinfra-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duploinfra-', ''), '\",\"value\":\"', item.name, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "Name",
+										"label": "Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "NSGName",
+										"label": "NSG name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "SrcRuleType",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Source Type",
+										"defaultValue": 0,
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "IP Address",
+													"value": 0
+												},
+												{
+													"label": "Service Tag",
+													"value": 1
+												},
+												{
+													"label": "Application security group",
+													"value": 2
+													}
+											]
+										}
+									},
+									{
+										"name": "SrcAddressPrefix",
+										"label": "Source",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "*",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "SourcePortRange",
+										"label": "Source Port Range",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "*",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "DstRuleType",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Destination Type",
+										"defaultValue": 0,
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "IP Address",
+													"value": 0
+												},
+												{
+													"label": "Service Tag",
+													"value": 1
+												},
+												{
+													"label": "Application security group",
+													"value": 2
+													}
+											]
+										}
+									},
+									{
+										"name": "DstAddressPrefix",
+										"label": "Destination",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "*",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "DestinationPortRange",
+										"label": "Destination Port Range",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "Protocol",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Protocol",
+										"defaultValue": "*",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Both",
+													"value": "*"
+												},
+												{
+													"label": "TCP",
+													"value": "tcp"
+												},
+												{
+													"label": "UDP",
+													"value": "udp"
+												}
+											]
+										}
+									},
+									{
+										"name": "Direction",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Direction",
+										"defaultValue": "Inbound",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Inbound",
+													"value": "Inbound"
+												},
+												{
+													"label": "Outbound",
+													"value": "Outbound"
+												}
+											]
+										}
+									},
+									{
+										"name": "RuleAction",
+										"type": "Microsoft.Common.DropDown",
+										"label": "RuleAction",
+										"defaultValue": "Allow",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Allow",
+													"value": "Allow"
+												},
+												{
+													"label": "Deny",
+													"value": "Deny"
+												}
+											]
+										}
+									},
+									{
+										"name": "Priority",
+										"label": "Priority",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									}
+								]
+							}
+						],
+						"outputs": {
+							"Name": "[steps('basic').Name]",
+							"NSGName": "[steps('basic').NSGName]",
+							"SrcAddressPrefix": "[steps('basic').SrcAddressPrefix]",
+							"DstAddressPrefix": "[steps('basic').DstAddressPrefix]",
+							"SourcePortRange": "[steps('basic').SourcePortRange]",
+							"DestinationPortRange": "[steps('basic').DestinationPortRange]",
+							"Protocol": "[steps('basic').Protocol]",
+							"Direction": "[steps('basic').Direction]",
+							"RuleAction": "[steps('basic').RuleAction]",
+							"Priority": "[steps('basic').Priority]",
+							"SrcRuleType": "[steps('basic').SrcRuleType]",
+							"DstRuleType": "[steps('basic').DstRuleType]"
+						}
+					}
+				},
+				"commands": [
+				],
+				"columns": [
+					{
+						"key": "properties.NSGName",
+						"displayName": "NSG Name"
+					},
+					{
+						"key": "properties.Name",
+						"displayName": "Rule Name"
+					},
+					{
+						"key": "properties.Protocol",
+						"displayName": "Protocol"
+					},
+					{
+						"key": "properties.SrcAddressPrefix",
+						"displayName": "Source Address prefix"
+					},
+					{
+						"key": "properties.SourcePortRange",
+						"displayName": "Source Port Range"
+					},
+					{
+						"key": "properties.DstAddressPrefix",
+						"displayName": "Dest Address prefix"
+					},
+					{
+						"key": "properties.DestinationPortRange",
+						"displayName": "Dest Port Range"
+					},
+					{
+						"key": "properties.RuleAction",
+						"displayName": "Rule Action"
+					},
+					{
+						"key": "properties.Direction",
+						"displayName": "Direction"
+					},
+					{
+						"key": "properties.Priority",
+						"displayName": "Priority"
+					}
+				]
+			}
+		},
+		{
+			"kind": "CustomResources",
+			"properties": {
+				"displayName": "Meta Data",
+				"version": "1.0.0.0",
+				"resourceType": "PlanConfigs",
+				"createUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters":
+					{
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements":[
+									{
+										"name": "Name",
+										"label": "Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "Type",
+										"label": "Type",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "Value",
+										"label": "Value",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									}
+								]
+							}
+						],
+						"outputs": {
+							"Key": "[steps('basic').Name]",
+							"Type": "[steps('basic').Type]",
+							"Value": "[steps('basic').Value]"
+						}
+					}
+				},
+				"commands": [
+				],
+				"columns": [
+					{
+						"key": "properties.Key",
+						"displayName": "Name"
+					},
+					{
+						"key": "properties.Type",
+						"displayName": "Type"
+					},
+					{
+						"key": "properties.Value",
+						"displayName": "Value"
+					}
+				]
+			}
+		},
+		{
+			"kind": "CustomResources",
+			"properties": {
+				"displayName": "Images",
+				"version": "1.0.0.0",
+				"resourceType": "Images",
+				"createUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters":
+					{
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements":[
+									{
+										"name": "Name",
+										"label": "Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "Type",
+										"label": "Type",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "Value",
+										"label": "Value",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									}
+								]
+							}
+						],
+						"outputs": {
+							"Key": "[steps('basic').name]"
+						}
+					}
+				},
+				"commands": [
+				],
+				"columns": [
+					{
+						"key": "properties.Name",
+						"displayName": "Name"
+					},
+					{
+						"key": "properties.ImageId",
+						"displayName": "ImageId"
+					},
+					{
+						"key": "properties.OS",
+						"displayName": "OS"
+					}
+				]
+			}
+		},
+		{
+			"kind": "CustomResources",
+			"properties": {
+				"displayName": "Tenant",
+				"version": "1.0.0.0",
+				"resourceType": "Tenant",
+				"commands": [
+				],
+				"columns": [
+					{
+						"key": "properties.AccountName",
+						"displayName": "AccountName"
+					},
+					{
+						"key": "properties.TenantId",
+						"displayName": "TenantId"
+					}
+				]
+			}
 		}
 	]
 }
