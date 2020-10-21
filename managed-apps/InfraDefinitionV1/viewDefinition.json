@@ -20,41 +20,59 @@
 				"displayName": "Infrastructure",
 				"version": "1.0.0.0",
 				"resourceType": "Infrastructure",
-				"createUIDefinition": {
-					"handler": "Microsoft.Azure.CreateUIDef",
-					"parameters": 
-					{
-						"config": {
-							"isWizard": true
-						},
-						"basics": [],
-						"steps": [
-							{
-								"name": "basic",
-								"label": "Basic",
-								"elements":[
-									{
-										"name": "name",
-										"label": "Name",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									}
-								]
-							}
-						],
-						"outputs": {
-							"Name": "[steps('basic').name]"
-						}
-					}
-				},
 				"commands": [
 					{
-						"displayName": "Test",
+						"displayName": "Log Analytics",
 						"path": "Infrastructure/ProxyPost",
-						"icon": "Start"
+						"icon": "Link",
+						"createUIDefinition": {
+							"handler": "Microsoft.Azure.CreateUIDef",
+							"parameters": 
+							{
+								"config": {
+									"isWizard": true
+								},
+								"basics": [],
+								"steps": [
+									{
+										"name": "basic",
+										"label": "Basic",
+										"elements":[
+											{
+												"name": "loganalyticsapi",
+												"type": "Microsoft.Solutions.ArmApiControl",
+												"request": {
+													"method": "POST",
+													"path": "subscriptions/29474c73-cd93-48f0-80ee-9577a54e2227/resourceGroups/duplomgapp-mgr-azdemo1/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview"
+													,
+													"body": {
+														"BackendUrl": "GetInfrastructureLogAnalyticsWorkspace/<InfraName>",
+														"Method": "GET"
+													}
+												}	
+											},
+											{
+												"name": "name",
+												"label": "Name",
+												"type": "Microsoft.Common.TextBox",
+												"defaultValue": "",
+												"constraints": {
+													"required": true
+												}
+											}
+										]
+									}
+								],
+								"outputs": {
+									"Name": "[steps('basic').name]"
+								}
+							}
+						}
+					},
+					{
+						"displayName": "Vault Config",
+						"path": "Infrastructure/ProxyPost",
+						"icon": "Link"
 					}
 				],
 				"columns": [
@@ -63,12 +81,28 @@
 						"displayName": "Name"
 					},
 					{
+						"key": "properties.Region",
+						"displayName": "Region"
+					},
+					{
 						"key": "properties.Vnet.AddressPrefix",
 						"displayName": "AddressPrefix"
 					},
 					{
 						"key": "properties.ProvisioningStatus",
 						"displayName": "Status"
+					},
+					{
+						"key": "properties.LogAnalyticsConfig.Name",
+						"displayName": "Log Analytics Workspace"
+					},
+					{
+						"key": "properties.RecoveryVaultConfig.Name",
+						"displayName": "Vault Config"
+					},
+					{
+						"key": "properties.AksConfig.Name",
+						"displayName": "AKS Cluster"
 					}
 				]
 			}
@@ -100,22 +134,78 @@
 										"constraints": {
 											"required": true
 										}
+									},
+									{
+										"name": "AddressPrefix",
+										"label": "Address Prefix",
+										"type": "Microsoft.Common.TextBox",
+										"placeholder": "10.50.1.0/24",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "SubnetType",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Subnet Type",
+										"defaultValue": "none",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "None",
+													"value": "none"
+												},
+												{
+													"label": "Application Gateway",
+													"value": "appgwsubnet"
+												},
+												{
+													"label": "Application Service Env",
+													"value": "appserviceenv"
+													},
+												{
+													"label": "Managed Instance",
+													"value": "managedinstance"
+												},
+												{
+													"label": "Azure Bastion Subnet",
+													"value": "azurebastionsubnet"
+												}
+											]
+										}
+									},
+									{
+										"name": "ServiceEndpoints",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Service Endpoints",
+										"placeholder": "Select Service Endpoints.",
+										"multiselect": true,
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Microsoft.Storage",
+													"value": "Microsoft.Storage"
+												},
+												{
+													"label": "Microsoft.Sql",
+													"value": "Microsoft.Sql"
+												}
+											]
+										}
 									}
 								]
 							}
 						],
 						"outputs": {
-							"Name": "[steps('basic').name]"
+							"NameEx": "[steps('basic').name]",
+							"AddressPrefix": "[steps('basic').AddressPrefix]",
+							"SubnetType": "[steps('basic').SubnetType]",
+							"ServiceEndpoints": "[steps('basic').ServiceEndpoints]"
 						}
 					}
 				},
-				"commands": [
-					{
-						"displayName": "Test",
-						"path": "Subnet/ProxyPost",
-						"icon": "Start"
-					}
-				],
+				"commands": [],
 				"columns": [
 					{
 						"key": "properties.NameEx",
@@ -124,6 +214,329 @@
 					{
 						"key": "properties.AddressPrefix",
 						"displayName": "AddressPrefix"
+					}
+				]
+			}
+		},
+		{
+			"kind": "CustomResources",
+			"properties": {
+				"displayName": "Backup policies",
+				"version": "1.0.0.0",
+				"resourceType": "VaultBackupPolicies",
+				"createUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters": 
+					{
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements":[
+									{
+										"name": "name",
+										"label": "Policy Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "schedule",
+										"type": "Microsoft.Common.Section",
+										"label": "Backup Schedule",
+										"elements": [
+											{
+												"name": "frequency",
+												"type": "Microsoft.Common.DropDown",
+												"label": "Frequency",
+												"placeholder": "",
+												"defaultValue": "Daily",
+												"toolTip": "",
+												"constraints": {
+													"allowedValues": [
+														{
+															"label": "Daily",
+															"value": "Daily"
+														},
+														{
+															"label": "Weekly",
+															"value": "Weekly"
+														}
+													],
+													"required": true
+												},
+												"visible": true
+											},
+											{
+												"name": "time",
+												"type": "Microsoft.Common.DropDown",
+												"label": "Time",
+												"placeholder": "",
+												"defaultValue": 0,
+												"toolTip": "",
+												"constraints": {
+													"allowedValues": [
+														{
+															"label": "12:00AM",
+															"value": 0
+														},
+														{
+															"label": "12:30AM",
+															"value": 30
+														}
+													],
+													"required": true
+												},
+												"visible": true
+											},
+											{
+												"name": "timezone",
+												"type": "Microsoft.Common.DropDown",
+												"label": "Time Zone",
+												"placeholder": "",
+												"defaultValue": "UTC",
+												"toolTip": "",
+												"constraints": {
+													"allowedValues": [
+														{
+															"label": "UTC",
+															"value": "UTC"
+														},
+														{
+															"label": "PST",
+															"value": "PST"
+														}
+													],
+													"required": true
+												},
+												"visible": true
+											}
+										],
+										"visible": true
+									},
+									{
+										"name": "restore",
+										"type": "Microsoft.Common.Section",
+										"label": "Instant Restore",
+										"elements": [
+											{
+												"name": "days",
+												"type": "Microsoft.Common.TextBox",
+												"defaultValue": "2",
+												"label": "Retain instant recovery snapshot(s) for Days"
+											}
+										],
+										"visible": true
+									},
+									{
+										"name": "retention",
+										"type": "Microsoft.Common.Section",
+										"label": "Retention Range",
+										"elements": [
+											{
+												"name": "dailyretention",
+												"type": "Microsoft.Common.TextBox",
+												"defaultValue": "180",
+												"label": "Retention of daily backup points(days)"
+											}
+										],
+										"visible": true
+									}
+								]
+							}
+						],
+						"outputs": {
+							"name": "[steps('basic').name]",
+							"properties": {
+								"backupManagementType": "AzureIaasVM",
+								"timeZone": "Pacific Standard Time",
+								"instantRpRetentionRangeInDays": "[int(steps('basic').restore.days)]",
+								"schedulePolicy": {
+									"schedulePolicyType": "SimpleSchedulePolicy",
+									"scheduleRunFrequency": "[steps('basic').schedule.frequency]",
+									"scheduleRunTimes": "[split(addMinutes('1990-12-31T00:00:00Z', int(steps('basic').schedule.time)), '*')]"
+								},
+								"retentionPolicy": {
+									"retentionPolicyType": "LongTermRetentionPolicy",
+									"dailySchedule": {
+										"retentionTimes": "[split(addMinutes('1990-12-31T00:00:00Z', int(steps('basic').schedule.time)), '*')]",
+										"retentionDuration": {
+											"count": "[int(steps('basic').retention.dailyretention)]",
+											"durationType": "Days"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"editUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters": 
+					{
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements":[
+									{
+										"name": "name",
+										"label": "Policy Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "schedule",
+										"type": "Microsoft.Common.Section",
+										"label": "Backup Schedule",
+										"elements": [
+											{
+												"name": "frequency",
+												"type": "Microsoft.Common.DropDown",
+												"label": "Frequency",
+												"placeholder": "",
+												"defaultValue": "Daily",
+												"toolTip": "",
+												"constraints": {
+													"allowedValues": [
+														{
+															"label": "Daily",
+															"value": "Daily"
+														},
+														{
+															"label": "Weekly",
+															"value": "Weekly"
+														}
+													],
+													"required": true
+												},
+												"visible": true
+											},
+											{
+												"name": "time",
+												"type": "Microsoft.Common.DropDown",
+												"label": "Time",
+												"placeholder": "",
+												"defaultValue": 0,
+												"toolTip": "",
+												"constraints": {
+													"allowedValues": [
+														{
+															"label": "12:00AM",
+															"value": 0
+														},
+														{
+															"label": "12:30AM",
+															"value": 30
+														}
+													],
+													"required": true
+												},
+												"visible": true
+											},
+											{
+												"name": "timezone",
+												"type": "Microsoft.Common.DropDown",
+												"label": "Time Zone",
+												"placeholder": "",
+												"defaultValue": "UTC",
+												"toolTip": "",
+												"constraints": {
+													"allowedValues": [
+														{
+															"label": "UTC",
+															"value": "UTC"
+														},
+														{
+															"label": "PST",
+															"value": "PST"
+														}
+													],
+													"required": true
+												},
+												"visible": true
+											}
+										],
+										"visible": true
+									},
+									{
+										"name": "restore",
+										"type": "Microsoft.Common.Section",
+										"label": "Instant Restore",
+										"elements": [
+											{
+												"name": "days",
+												"type": "Microsoft.Common.TextBox",
+												"defaultValue": "2",
+												"label": "Retain instant recovery snapshot(s) for Days"
+											}
+										],
+										"visible": true
+									},
+									{
+										"name": "retention",
+										"type": "Microsoft.Common.Section",
+										"label": "Retention Range",
+										"elements": [
+											{
+												"name": "dailyretention",
+												"type": "Microsoft.Common.TextBox",
+												"defaultValue": "180",
+												"label": "Retention of daily backup points(days)"
+											}
+										],
+										"visible": true
+									}
+								]
+							}
+						],
+						"outputs": {
+							"name": "[steps('basic').name]",
+							"properties": {
+								"backupManagementType": "AzureIaasVM",
+								"timeZone": "Pacific Standard Time",
+								"instantRpRetentionRangeInDays": "[int(steps('basic').restore.days)]",
+								"schedulePolicy": {
+									"schedulePolicyType": "SimpleSchedulePolicy",
+									"scheduleRunFrequency": "[steps('basic').schedule.frequency]",
+									"scheduleRunTimes": "[split(addMinutes('1990-12-31T00:00:00Z', int(steps('basic').schedule.time)), '*')]"
+								},
+								"retentionPolicy": {
+									"retentionPolicyType": "LongTermRetentionPolicy",
+									"dailySchedule": {
+										"retentionTimes": "[split(addMinutes('1990-12-31T00:00:00Z', int(steps('basic').schedule.time)), '*')]",
+										"retentionDuration": {
+											"count": "[int(steps('basic').retention.dailyretention)]",
+											"durationType": "Days"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"commands": [],
+				"columns": [
+					{
+						"key": "name",
+						"displayName": "Name"
+					},
+					{
+						"key": "properties.schedulePolicy.scheduleRunFrequency",
+						"displayName": "Frequency"
 					}
 				]
 			}
