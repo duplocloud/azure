@@ -92,11 +92,11 @@
 														},
 														{
 															"label": "Application Gateway",
-															"value": "appgateway"
+															"value": "appgwsubnet"
 														},
 														{
 															"label": "Application Service Env",
-															"value": "appsevenv"
+															"value": "appserviceenv"
 															},
 														{
 															"label": "Managed Instance",
@@ -104,7 +104,7 @@
 														},
 														{
 															"label": "Azure Bastion Subnet",
-															"value": "azurebastion"
+															"value": "azurebastionsubnet"
 														}
 													]
 												}
@@ -117,7 +117,7 @@
 											"element": {
 												"name": "dropDown1",
 												"type": "Microsoft.Common.DropDown",
-												"placeholder": "Select a gender...",
+												"placeholder": "Select Service Endpoints",
 												"multiselect": true,
 												"constraints": {
 													"allowedValues": [
@@ -143,6 +143,27 @@
 						"name": "loganalyticsws",
 						"type": "Microsoft.Common.DropDown",
 						"label": "Log Analytics Workspace",
+						"placeholder": "",
+						"toolTip": "",
+						"constraints": {
+							"allowedValues": [
+								{
+									"label": "No",
+									"value": false
+								},
+								{
+									"label": "Yes",
+									"value": true
+								}
+							],
+							"required": true
+						},
+						"visible": true
+					},
+					{
+						"name": "vaultconfig",
+						"type": "Microsoft.Common.DropDown",
+						"label": "Vault Config",
 						"placeholder": "",
 						"toolTip": "",
 						"constraints": {

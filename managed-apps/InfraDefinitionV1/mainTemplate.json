@@ -50,7 +50,7 @@
                     "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRpAtRoot"
                 },
                 {
-                    "name": "VirtualMachines/ProxyPost",
+                    "name": "LogAnalytics/ProxyPost",
                     "routingType": "Proxy",
                     "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
                 }
@@ -93,6 +93,16 @@
                 },
                 {
                     "name": "Tenant",
+                    "routingType": "Proxy",
+                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+                },
+                {
+                    "name": "LogAnalytics",
+                    "routingType": "Proxy",
+                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+                },
+                {
+                    "name": "VaultConfig",
                     "routingType": "Proxy",
                     "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
                 }
