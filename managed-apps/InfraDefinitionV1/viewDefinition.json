@@ -186,6 +186,18 @@
 										"visible": true
 									},
 									{
+										"name": "nsgApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"body": {
+												"BackendUrl": "GetInfraSecurityGroups/<InfraName>",
+												"Method": "GET"
+											}
+										}	
+									},
+									{
 										"name": "Name",
 										"label": "Name",
 										"type": "Microsoft.Common.TextBox",
@@ -196,12 +208,14 @@
 									},
 									{
 										"name": "NSGName",
+										"type": "Microsoft.Common.DropDown",
 										"label": "NSG name",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
+										"toolTip": "Choose one of the NSG",
 										"constraints": {
+											"allowedValues": "[map(steps('basic').nsgApi.value, (item) => parse(concat('{\"label\":\"', item.Name, '\",\"value\":\"', item.Name, '\"}')))]",
 											"required": true
-										}
+										},
+										"visible": true
 									},
 									{
 										"name": "SrcRuleType",
@@ -444,15 +458,6 @@
 										}
 									},
 									{
-										"name": "Type",
-										"label": "Type",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
 										"name": "Value",
 										"label": "Value",
 										"type": "Microsoft.Common.TextBox",
@@ -466,7 +471,6 @@
 						],
 						"outputs": {
 							"Key": "[steps('basic').Name]",
-							"Type": "[steps('basic').Type]",
 							"Value": "[steps('basic').Value]"
 						}
 					}
@@ -477,10 +481,6 @@
 					{
 						"key": "properties.Key",
 						"displayName": "Name"
-					},
-					{
-						"key": "properties.Type",
-						"displayName": "Type"
 					},
 					{
 						"key": "properties.Value",
@@ -518,8 +518,8 @@
 										}
 									},
 									{
-										"name": "Type",
-										"label": "Type",
+										"name": "ImageId",
+										"label": "Image Id",
 										"type": "Microsoft.Common.TextBox",
 										"defaultValue": "",
 										"constraints": {
@@ -527,19 +527,25 @@
 										}
 									},
 									{
-										"name": "Value",
-										"label": "Value",
+										"name": "OS",
+										"label": "OS",
 										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
+										"defaultValue": ""
+									},
+									{
+										"name": "Base64UserData",
+										"label": "User Data",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": ""
 									}
 								]
 							}
 						],
 						"outputs": {
-							"Key": "[steps('basic').name]"
+							"Name": "[steps('basic').Name]",
+							"ImageId": "[steps('basic').ImageId]",
+							"OS": "[steps('basic').OS]",
+							"Base64UserData": "[steps('basic').Base64UserData]"
 						}
 					}
 				},
@@ -552,7 +558,7 @@
 					},
 					{
 						"key": "properties.ImageId",
-						"displayName": "ImageId"
+						"displayName": "Image Id"
 					},
 					{
 						"key": "properties.OS",

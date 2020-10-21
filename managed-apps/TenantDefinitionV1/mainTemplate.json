@@ -44,6 +44,16 @@
                         "name": "VirtualMachines",
                         "routingType": "Proxy",
                         "endpoint": "https://incloud.duplocloud.net/InvokeAzureRp"
+                    },
+                    {
+                        "name": "UpdatePolicies",
+                        "routingType": "Proxy",
+                        "endpoint": "https://incloud.duplocloud.net/InvokeAzureRp"
+                    },
+                    {
+                        "name": "BackupPolices",
+                        "routingType": "Proxy",
+                        "endpoint": "https://incloud.duplocloud.net/InvokeAzureRp"
                     }
                 ]
             }

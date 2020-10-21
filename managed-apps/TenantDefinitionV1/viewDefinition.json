@@ -360,6 +360,106 @@
 					}
 				]
 			}
+		},
+
+		{
+			"kind": "CustomResources",
+			"properties": {
+				"displayName": "Update Policies",
+				"version": "1.0.0.0",
+				"resourceType": "UpdatePolicies",
+				"createUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters": {
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements": [
+									{
+										"name": "subscriptionsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "GET",
+											"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
+										}
+									},
+									{
+										"name": "subscriptionDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Subscriptions",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "resourceGroupsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "GET",
+											"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
+										}
+									},
+									{
+										"name": "resourceGroupDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Resource Groups",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duploinfra-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duploinfra-', ''), '\",\"value\":\"', item.name, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "Name",
+										"label": "Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"toolTip": "Choose a name for the VM",
+										"constraints": {
+											"required": true
+										}
+									}
+								]
+							}
+						],
+						"outputs": {
+							"FriendlyName": "[steps('basic').name]",
+							"Capacity": "[steps('basic').type]",
+							"EncryptDisk": "[steps('advanced').encryption]",
+							"ImageId": "[steps('basic').imageid]",
+							"Base64UserData": "[steps('advanced').userdata]",
+							"AllocatedPublicIp": "[steps('networking').publicip]",
+							"Cloud": 2,
+							"MetaDataEx": {
+								"OsDiskSize": "[steps('advanced').disksize]",
+								"JoinDomain": "[steps('networking').joinDomain]",
+								"JoinLogAnalytics": "[steps('networking').joinLogAnalyticsWs]"
+							}
+						}
+					}
+				},
+				"commands": [
+				],
+				"columns": [
+					{
+						"key": "properties.Name",
+						"displayName": "Full Name"
+					},
+					{
+						"key": "properties.properties.updateConfiguration.duration",
+						"displayName": "duration"
+					}
+				]
+			}
 		}
 	]
 }
