@@ -413,17 +413,123 @@
 										"label": "Resource Groups",
 										"toolTip": "",
 										"constraints": {
-											"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duploinfra-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duploinfra-', ''), '\",\"value\":\"', item.name, '\"}')))]",
+											"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duplomgapp-mgr-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duplomgapp-mgr-', ''), '\",\"value\":\"', item.name, '\"}')))]",
 											"required": true
 										},
 										"visible": true
 									},
 									{
-										"name": "Name",
-										"label": "Name",
+										"name": "vmListApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"body": {
+												"BackendUrl": "GetAsyncNativeHosts",
+												"Method": "GET"
+											}
+										}	
+									},
+									{
+										"name": "VmName",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Virtual Machine",
+										"toolTip": "Choose one of the Virtual Machine",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').vmListApi.value, (item) => parse(concat('{\"label\":\"', item.FriendlyName, '\",\"value\":\"', item.FriendlyName, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "UpdateClassifications",
+										"label": "Update Classifications",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "Critical",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Critical",
+													"value": "Critical"
+												},
+												{
+													"label": "Security",
+													"value": "Security"
+												},
+												{
+													"label": "Other",
+													"value": "Other"
+												},
+												{
+													"label": "Unclassified",
+													"value": "Unclassified"
+												}
+											]
+										}
+									},
+									{
+										"name": "rebootSetting",
+										"label": "Reboot settings",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "RebootOnly",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "RebootOnly",
+													"value": "RebootOnly"
+												},
+												{
+													"label": "IfRequired",
+													"value": "IfRequired"
+												}
+
+											]
+										}
+									},
+									{
+										"name": "frequency",
+										"label": "Frequency",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "OneTime",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "OneTime",
+													"value": "OneTime"
+												}
+											]
+										}
+									},
+									{
+										"name": "startTime",
+										"label": "Update on",
 										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"toolTip": "Choose a name for the VM",
+										"defaultValue": "2020-10-28T19:00:00",
+										"toolTip": "Format of timestamp 2020-10-28T19:00:00",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "timeZone",
+										"label": "TimeZone",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "America/Los_Angeles",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "America/Los_Angeles",
+													"value": "America/Los_Angeles"
+												}
+											]
+										}
+									},
+									{
+										"name": "duration",
+										"label": "Duration",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "2H0M0S",
+										"toolTip": "Format of duration 2H0M0S <N>Hours <N>Minutes <N> Seconds",
 										"constraints": {
 											"required": true
 										}
@@ -432,17 +538,19 @@
 							}
 						],
 						"outputs": {
-							"FriendlyName": "[steps('basic').name]",
-							"Capacity": "[steps('basic').type]",
-							"EncryptDisk": "[steps('advanced').encryption]",
-							"ImageId": "[steps('basic').imageid]",
-							"Base64UserData": "[steps('advanced').userdata]",
-							"AllocatedPublicIp": "[steps('networking').publicip]",
-							"Cloud": 2,
-							"MetaDataEx": {
-								"OsDiskSize": "[steps('advanced').disksize]",
-								"JoinDomain": "[steps('networking').joinDomain]",
-								"JoinLogAnalytics": "[steps('networking').joinLogAnalyticsWs]"
+							"VmName": "[steps('basic').VmName]",
+							"properties": {
+								"updateConfiguration": {
+									"linux": {
+										"includedUpdateClassifications": "[steps('basic').UpdateClassifications]",
+										"rebootSetting": "[steps('basic').rebootSetting]"
+									}
+								},
+								"scheduleInfo": {
+									"frequency": "[steps('basic').frequency]",
+									"startTime": "[concat(steps('basic').startTime, '+00:00')]",
+									"timeZone": "[steps('basic').timeZone]"
+								}
 							}
 						}
 					}
@@ -451,12 +559,8 @@
 				],
 				"columns": [
 					{
-						"key": "properties.Name",
-						"displayName": "Full Name"
-					},
-					{
-						"key": "properties.properties.updateConfiguration.duration",
-						"displayName": "duration"
+						"key": "name",
+						"displayName": "Name"
 					}
 				]
 			}
