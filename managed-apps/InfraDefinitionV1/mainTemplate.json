@@ -34,7 +34,14 @@
 		"metadata": {
             "description": "Property to enable LogAnalyticsConfig."
         }
+	},
+	"vaultconfig": {
+		"type": "bool",
+		"metadata": {
+            "description": "Property to enable Recovery services vault config."
+        }
 	}
+	
   },
   "resources": [
     {
@@ -126,7 +133,10 @@
                 "Subnets": "[parameters('Subnets')]"
             },
 			"LogAnalyticsConfig": {
-				"Name" : "default"
+				"Name" : "[if(parameters('loganalyticsws'), 'default', '')]"
+			},
+			"RecoveryVaultConfig": {
+				"Name" : "[if(parameters('vaultconfig'), 'default', '')]"
 			}
         }
     }

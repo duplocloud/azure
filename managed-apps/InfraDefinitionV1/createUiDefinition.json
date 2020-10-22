@@ -188,7 +188,8 @@
 			"subscriptionId": "[subscription().subscriptionId]",
 			"vnetCidr": "[steps('infrastructureSettings').vnetCidr]",
 			"Subnets": "[steps('infrastructureSettings').subnetSection.subnet]",
-			"loganalyticsws": "[steps('infrastructureSettings').loganalyticsws]"
+			"loganalyticsws": "[steps('infrastructureSettings').loganalyticsws]",
+			"vaultconfig": "[steps('infrastructureSettings').vaultconfig]"
 		}
 	}
 }
