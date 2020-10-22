@@ -845,6 +845,200 @@
 		{
 			"kind": "CustomResources",
 			"properties": {
+				"displayName": "Log Analytics Workspace",
+				"version": "1.0.0.0",
+				"resourceType": "LogAnalytics",
+				"createUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters":
+					{
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements":[
+									{
+										"name": "Name",
+										"label": "Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "Type",
+										"label": "Resource Group",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {}
+									}
+								]
+							}
+						],
+						"outputs": {
+							"Name": "[steps('basic').Name]",
+							"ResourceGroup": "[steps('basic').Type]"
+						}
+					}
+				},
+				"editUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters":
+					{
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements":[
+									{
+										"name": "Name",
+										"label": "Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "Type",
+										"label": "Resource Group",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {}
+									}
+								]
+							}
+						],
+						"outputs": {
+							"Name": "[steps('basic').Name]",
+							"ResourceGroup": "[steps('basic').Type]"
+						}
+					}
+				},
+				"commands": [],
+				"columns": [
+					{
+						"key": "name",
+						"displayName": "Name"
+					},
+					{
+						"key": "location",
+						"displayName": "Location"
+					}
+				]
+			}
+		},
+		{
+			"kind": "CustomResources",
+			"properties": {
+				"displayName": "Recovery Services Vault Config",
+				"version": "1.0.0.0",
+				"resourceType": "VaultConfig",
+				"createUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters":
+					{
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements":[
+									{
+										"name": "Name",
+										"label": "Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "Type",
+										"label": "Resource Group",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {}
+									}
+								]
+							}
+						],
+						"outputs": {
+							"Name": "[steps('basic').Name]",
+							"ResourceGroup": "[steps('basic').Type]"
+						}
+					}
+				},
+				"editUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters":
+					{
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements":[
+									{
+										"name": "Name",
+										"label": "Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "Type",
+										"label": "Resource Group",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"constraints": {}
+									}
+								]
+							}
+						],
+						"outputs": {
+							"Name": "[steps('basic').Name]",
+							"ResourceGroup": "[steps('basic').Type]"
+						}
+					}
+				},
+				"commands": [],
+				"columns": [
+					{
+						"key": "name",
+						"displayName": "Name"
+					},
+					{
+						"key": "location",
+						"displayName": "Location"
+					},
+					{
+						"key": "properties.provisioningState",
+						"displayName": "Status"
+					}
+				]
+			}
+		},
+		{
+			"kind": "CustomResources",
+			"properties": {
 				"displayName": "Meta Data",
 				"version": "1.0.0.0",
 				"resourceType": "PlanConfigs",
