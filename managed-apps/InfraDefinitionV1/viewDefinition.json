@@ -5,13 +5,7 @@
 			"properties": {
 				"header": "DuploCloud Infra",
 				"description": "Network components like Vnet , Subnet , NSG are managed here",
-				"commands": [
-					{
-						"displayName": "Ping Action",
-						"path": "/customping",
-						"icon": "LaunchCurrent"
-					}
-				]
+				"commands": []
 			}
 		},
 		{
@@ -20,61 +14,7 @@
 				"displayName": "Infrastructure",
 				"version": "1.0.0.0",
 				"resourceType": "Infrastructure",
-				"commands": [
-					{
-						"displayName": "Log Analytics",
-						"path": "Infrastructure/ProxyPost",
-						"icon": "Link",
-						"createUIDefinition": {
-							"handler": "Microsoft.Azure.CreateUIDef",
-							"parameters": 
-							{
-								"config": {
-									"isWizard": true
-								},
-								"basics": [],
-								"steps": [
-									{
-										"name": "basic",
-										"label": "Basic",
-										"elements":[
-											{
-												"name": "loganalyticsapi",
-												"type": "Microsoft.Solutions.ArmApiControl",
-												"request": {
-													"method": "POST",
-													"path": "subscriptions/29474c73-cd93-48f0-80ee-9577a54e2227/resourceGroups/duplomgapp-mgr-azdemo1/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview"
-													,
-													"body": {
-														"BackendUrl": "GetInfrastructureLogAnalyticsWorkspace/<InfraName>",
-														"Method": "GET"
-													}
-												}	
-											},
-											{
-												"name": "name",
-												"label": "Name",
-												"type": "Microsoft.Common.TextBox",
-												"defaultValue": "",
-												"constraints": {
-													"required": true
-												}
-											}
-										]
-									}
-								],
-								"outputs": {
-									"Name": "[steps('basic').name]"
-								}
-							}
-						}
-					},
-					{
-						"displayName": "Vault Config",
-						"path": "Infrastructure/ProxyPost",
-						"icon": "Link"
-					}
-				],
+				"commands": [],
 				"columns": [
 					{
 						"key": "properties.Name",
@@ -886,44 +826,6 @@
 						}
 					}
 				},
-				"editUIDefinition": {
-					"handler": "Microsoft.Azure.CreateUIDef",
-					"parameters":
-					{
-						"config": {
-							"isWizard": true
-						},
-						"basics": [],
-						"steps": [
-							{
-								"name": "basic",
-								"label": "Basic",
-								"elements":[
-									{
-										"name": "Name",
-										"label": "Name",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "Type",
-										"label": "Resource Group",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {}
-									}
-								]
-							}
-						],
-						"outputs": {
-							"Name": "[steps('basic').Name]",
-							"ResourceGroup": "[steps('basic').Type]"
-						}
-					}
-				},
 				"commands": [],
 				"columns": [
 					{
@@ -940,48 +842,10 @@
 		{
 			"kind": "CustomResources",
 			"properties": {
-				"displayName": "Recovery Services Vault Config",
+				"displayName": "Recovery Services Vault",
 				"version": "1.0.0.0",
 				"resourceType": "VaultConfig",
 				"createUIDefinition": {
-					"handler": "Microsoft.Azure.CreateUIDef",
-					"parameters":
-					{
-						"config": {
-							"isWizard": true
-						},
-						"basics": [],
-						"steps": [
-							{
-								"name": "basic",
-								"label": "Basic",
-								"elements":[
-									{
-										"name": "Name",
-										"label": "Name",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "Type",
-										"label": "Resource Group",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {}
-									}
-								]
-							}
-						],
-						"outputs": {
-							"Name": "[steps('basic').Name]",
-							"ResourceGroup": "[steps('basic').Type]"
-						}
-					}
-				},
-				"editUIDefinition": {
 					"handler": "Microsoft.Azure.CreateUIDef",
 					"parameters":
 					{

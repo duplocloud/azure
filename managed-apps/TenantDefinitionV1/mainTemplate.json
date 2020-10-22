@@ -51,7 +51,7 @@
                         "endpoint": "https://incloud.duplocloud.net/InvokeAzureRp"
                     },
                     {
-                        "name": "BackupPolices",
+                        "name": "ProtectedVM",
                         "routingType": "Proxy",
                         "endpoint": "https://incloud.duplocloud.net/InvokeAzureRp"
                     }
