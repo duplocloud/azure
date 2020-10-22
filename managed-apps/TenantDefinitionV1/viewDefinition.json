@@ -342,6 +342,34 @@
 								]
 							},
 							{
+								"name": "backup",
+								"label": "Backup policy",
+								"elements": [
+									{
+										"name": "backupPoliciesApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",											"body": {
+												"BackendUrl": "GetAzureVaultBackupPoliciesByTenant",
+												"Method": "GET"
+											}
+										}	
+									},
+									{
+										"name": "backupPolicy",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Backup Policy",
+										"toolTip": "Choose a backup policy",
+										"constraints": {
+											"allowedValues": "[map(steps('backup').backupPoliciesApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									}
+								]
+							},
+							{
 								"name": "patching",
 								"label": "Patching policy",
 								"elements": [
@@ -679,6 +707,258 @@
 					{
 						"key": "properties_updateConfiguration.duration",
 						"displayName": "Duration"
+					}
+				]
+			}
+		},
+		{
+			"kind": "CustomResources",
+			"properties": {
+				"displayName": "Protected VMs",
+				"version": "1.0.0.0",
+				"resourceType": "ProtectedVM",
+				"createUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters": {
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements": [
+									{
+										"name": "subscriptionsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "GET",
+											"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
+										}
+									},
+									{
+										"name": "subscriptionDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Subscriptions",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "resourceGroupsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "GET",
+											"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
+										}
+									},
+									{
+										"name": "resourceGroupDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Resource Groups",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duplomgapp-mgr-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duplomgapp-mgr-', ''), '\",\"value\":\"', item.name, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "vmListApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"body": {
+												"BackendUrl": "GetAsyncNativeHosts",
+												"Method": "GET"
+											}
+										}	
+									},
+									{
+										"name": "VmName",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Virtual Machine",
+										"toolTip": "Choose one of the Virtual Machine",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').vmListApi.value, (item) => parse(concat('{\"label\":\"', item.FriendlyName, '\",\"value\":\"', item.FriendlyName, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "backupPoliciesApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"body": {
+												"BackendUrl": "GetAzureVaultBackupPoliciesByTenant",
+												"Method": "GET"
+											}
+										}	
+									},
+									{
+										"name": "backupPolicy",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Backup Policy",
+										"toolTip": "Choose a backup policy",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').backupPoliciesApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+											"name": "backupPolicyInfo",
+											"type": "Microsoft.Common.InfoBox",
+											"visible": true,
+											"options": {
+													"icon": "None",
+													"text": "[first(steps('basic').backupPoliciesApi.value)]"
+											}
+									}						
+								]
+							}
+						],
+						"outputs": {
+							"VmName": "[steps('basic').VmName]",
+							"PolicyName": "[steps('basic').backupPolicy]"
+						}
+					}
+				},
+				"editUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters": {
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements": [
+									{
+										"name": "subscriptionsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "GET",
+											"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
+										}
+									},
+									{
+										"name": "subscriptionDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Subscriptions",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "resourceGroupsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "GET",
+											"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
+										}
+									},
+									{
+										"name": "resourceGroupDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Resource Groups",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duplomgapp-mgr-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duplomgapp-mgr-', ''), '\",\"value\":\"', item.name, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "vmListApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"body": {
+												"BackendUrl": "GetAsyncNativeHosts",
+												"Method": "GET"
+											}
+										}	
+									},
+									{
+										"name": "VmName",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Virtual Machine",
+										"toolTip": "Choose one of the Virtual Machine",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').vmListApi.value, (item) => parse(concat('{\"label\":\"', item.FriendlyName, '\",\"value\":\"', item.FriendlyName, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "backupPoliciesApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"body": {
+												"BackendUrl": "GetAzureVaultBackupPoliciesByTenant",
+												"Method": "GET"
+											}
+										}	
+									},
+									{
+										"name": "backupPolicy",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Backup Policy",
+										"toolTip": "Choose a backup policy",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').backupPoliciesApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+											"name": "backupPolicyInfo",
+											"type": "Microsoft.Common.InfoBox",
+											"visible": true,
+											"options": {
+													"icon": "None",
+													"text": "[first(steps('basic').backupPoliciesApi.value)]"
+											}
+									}						
+								]
+							}
+						],
+						"outputs": {
+							"VmName": "[steps('basic').VmName]",
+							"PolicyName": "[steps('basic').backupPolicy]"
+						}
+					}
+				},
+				"commands": [
+				],
+				"columns": [
+					{
+						"key": "name",
+						"displayName": "Name"
+					},
+					{
+						"key": "id",
+						"displayName": "Policy"
+					},
+					{
+						"key": "properties.protectionState",
+						"displayName": "Status"
 					}
 				]
 			}
