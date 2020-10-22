@@ -561,6 +561,18 @@
 					{
 						"key": "name",
 						"displayName": "Name"
+					},
+					{
+						"key": "properties_frequency",
+						"displayName": "Frequency"
+					},
+					{
+						"key": "properties_nextRun",
+						"displayName": "Next Run"
+					},
+					{
+						"key": "properties_updateConfiguration.duration",
+						"displayName": "Duration"
 					}
 				]
 			}

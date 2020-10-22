@@ -1,0 +1,115 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "FriendlyName": {
+            "type": "string",
+            "defaultValue": "host1",
+            "metadata": {
+                "description": "Name of the VM"
+            }
+        },
+        "Capacity": {
+          "type": "string",
+          "defaultValue": "Standard_D2s_v3",
+          "allowedValues": [
+            "Standard_D2s_v3",
+            "Standard_D4s_v3",
+            "Standard_DS14_v2",
+            "Standard_E64i_v3"
+          ],
+          "metadata": {
+              "description": "VM Capacity"
+            }
+          },
+        "ImageId": {
+            "type": "string",
+            "defaultValue": "16.04-LTS;Canonical;UbuntuServer",
+            "allowedValues": [
+                "16.04-LTS;Canonical;UbuntuServer",
+                "2016-Datacenter;MicrosoftWindowsServer;WindowsServer",
+                "Express;MicrosoftSQLServer;SQL2016SP1-WS2016"
+              ],
+            "metadata": {
+                "description": "The location for the resources."
+            }
+        },
+      "OsDiskSize": {
+        "type": "string",
+        "defaultValue": "127",
+        "metadata": {
+            "description": "Root Disk size in GB"
+        }
+    },
+    "JoinDomain": {
+        "type": "string",
+        "defaultValue": "false",
+        "allowedValues": [
+            "true",
+            "false"
+          ],
+        "metadata": {
+            "description": "Join Domain"
+          }
+        },
+        "joinLogAnalyticsWs": {
+            "type": "string",
+            "defaultValue": "true",
+            "allowedValues": [
+              "true",
+              "false"
+            ],
+            "metadata": {
+                "description": "Join Log Analytics Workspace"
+              }
+            }
+    },
+    "resources": [
+      {
+          "type": "Microsoft.CustomProviders/resourceProviders/VirtualMachines",
+          "name": "[concat('public/', parameters('FriendlyName'))]",
+          "apiVersion": "2018-09-01-preview",
+          "location": "EAST US",
+          "properties": 
+          {
+            "FriendlyName": "[parameters('FriendlyName')]",
+            "Capacity": "[parameters('Capacity')]",
+            "ImageId": "[parameters('ImageId')]",
+            "Cloud": 2,
+            "MetaDataEx": {
+                "OsDiskSize": "[parameters('OsDiskSize')]",
+                "JoinDomain": "[parameters('JoinDomain')]",
+                "joinLogAnalyticsWs": "[parameters('joinLogAnalyticsWs')]"
+            }
+        }
+      },
+      {
+        "type": "Microsoft.CustomProviders/resourceProviders/UpdatePolicies",
+        "name": "[concat('public/', parameters('FriendlyName'))]",
+        "apiVersion": "2018-09-01-preview",
+        "location": "EAST US",
+        "dependsOn": [
+            "[resourceId('Microsoft.CustomProviders/resourceProviders/VirtualMachines', 'public' , parameters('FriendlyName'))]"
+        ],
+        "properties": 
+        {
+            "VmName": "[concat('duploservices-azdemo1-', parameters('FriendlyName'))]",
+            "properties": {
+                "updateConfiguration": {
+                    "linux": {
+                        "includedUpdateClassifications": "Critical",
+                        "rebootSetting": "RebootOnly"
+                    }
+                },
+                "scheduleInfo": {
+                    "frequency": "OneTime",
+                    "startTime": "2020-10-28T19:00:00+00:00",
+                    "timeZone": "America/Los_Angeles"
+                }
+            }
+      }
+    }
+  ],
+    "outputs": {
+    }
+  }
