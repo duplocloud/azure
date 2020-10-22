@@ -133,10 +133,10 @@
                 "Subnets": "[parameters('Subnets')]"
             },
 			"LogAnalyticsConfig": {
-				"Name" : "[if(loganalyticsws, 'default', '')]"
+				"Name" : "[if(parameters('loganalyticsws'), 'default', '')]"
 			},
 			"RecoveryVaultConfig": {
-				"Name" : "[if(vaultconfig, 'default', '')]"
+				"Name" : "[if(parameters('vaultconfig'), 'default', '')]"
 			}
         }
     }
