@@ -14,6 +14,113 @@
 				"displayName": "Infrastructure",
 				"version": "1.0.0.0",
 				"resourceType": "Infrastructure",
+				"editUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters":
+					{
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements":[
+									{
+												"name": "updateComponentDropDown",
+												"type": "Microsoft.Common.DropDown",
+												"label": "Component to Update",
+												"placeholder": "",
+												"toolTip": "Choose a Component to Update",
+												"constraints": {
+													"allowedValues": [
+														{
+															"label": "Log Analytics",
+															"value": "LogAnalytics"
+														},
+														{
+															"label": "Recovery Vault",
+															"value": "RecoveryVault"
+														},
+														{
+															"label": "AKS Cluster",
+															"value": "AksCluster"
+														}
+													],
+													"required": true
+												},
+												"visible": true
+								  },
+									{
+										"name": "LgWsMessage",
+										"type": "Microsoft.Common.InfoBox",
+										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'LogAnalytics'), equals(steps('basic').LgWsName, ''))]",
+										"options": {
+											"icon": "None",
+											"text": "Log Analytics workspace has not been setup. Enter the following information to setup the cluster.",
+											"uri": "https://www.microsoft.com"
+										}
+									},
+									{
+										"name": "LgWsName",
+										"label": "Workspace Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValuePath": "properties.LogAnalyticsConfig.Name",
+										"constraints": {},
+										"visible": "[equals(steps('basic').updateComponentDropDown, 'LogAnalytics')]"
+									},
+									{
+										"name": "LgWsRgName",
+										"label": "Resource Group",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValuePath": "properties.LogAnalyticsConfig.ResourceGroup",
+										"constraints": {},
+										"visible": "[equals(steps('basic').updateComponentDropDown, 'LogAnalytics')]"
+									},									
+									{
+										"name": "RecoveryVaultConfig",
+										"label": "Recovery Vault Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValuePath": "properties.RecoveryVaultConfig.Name",
+										"constraints": {},
+										"visible": "[equals(steps('basic').updateComponentDropDown, 'RecoveryVault')]"
+									},
+									{
+										"name": "AksClusterMessage",
+										"type": "Microsoft.Common.InfoBox",
+										"options": {
+											"icon": "None",
+											"text": "AKS Cluster has not been setup. Enter the following information to setup the cluster.",
+											"uri": "https://www.microsoft.com"
+										},
+										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'AksCluster'), equals(steps('basic').AksClusterName, ''))]"
+									},
+									{
+										"name": "AksClusterName",
+										"label": "Cluster Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValuePath": "properties.AksConfig.Name",
+										"constraints": {},
+										"visible": "[equals(steps('basic').updateComponentDropDown, 'AksCluster')]"
+									},
+									{
+										"name": "AksClusterSize",
+										"label": "VM Size",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValuePath": "properties.AksConfig.VmSize",
+										"constraints": {},
+										"visible": "[equals(steps('basic').updateComponentDropDown, 'AksCluster')]"
+									}
+								]
+							}
+						],
+						"outputs": {
+							"Name": "[steps('basic').Name]",
+							"ResourceGroup": "[steps('basic').Type]"
+						}
+					}
+				},
 				"commands": [],
 				"columns": [
 					{
@@ -477,6 +584,14 @@
 					{
 						"key": "properties.schedulePolicy.scheduleRunFrequency",
 						"displayName": "Frequency"
+					},
+					{
+						"key": "properties.schedulePolicy.scheduleRunTimes",
+						"displayName": "Schedule"
+					},
+					{
+						"key": "properties.retentionPolicy.dailySchedule.retentionDuration.count",
+						"displayName": "Retention (Days)"
 					}
 				]
 			}
@@ -781,125 +896,7 @@
 					}
 				]
 			}
-		},
-		{
-			"kind": "CustomResources",
-			"properties": {
-				"displayName": "Log Analytics Workspace",
-				"version": "1.0.0.0",
-				"resourceType": "LogAnalytics",
-				"createUIDefinition": {
-					"handler": "Microsoft.Azure.CreateUIDef",
-					"parameters":
-					{
-						"config": {
-							"isWizard": true
-						},
-						"basics": [],
-						"steps": [
-							{
-								"name": "basic",
-								"label": "Basic",
-								"elements":[
-									{
-										"name": "Name",
-										"label": "Name",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "Type",
-										"label": "Resource Group",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {}
-									}
-								]
-							}
-						],
-						"outputs": {
-							"Name": "[steps('basic').Name]",
-							"ResourceGroup": "[steps('basic').Type]"
-						}
-					}
-				},
-				"commands": [],
-				"columns": [
-					{
-						"key": "name",
-						"displayName": "Name"
-					},
-					{
-						"key": "location",
-						"displayName": "Location"
-					}
-				]
-			}
-		},
-		{
-			"kind": "CustomResources",
-			"properties": {
-				"displayName": "Recovery Services Vault",
-				"version": "1.0.0.0",
-				"resourceType": "VaultConfig",
-				"createUIDefinition": {
-					"handler": "Microsoft.Azure.CreateUIDef",
-					"parameters":
-					{
-						"config": {
-							"isWizard": true
-						},
-						"basics": [],
-						"steps": [
-							{
-								"name": "basic",
-								"label": "Basic",
-								"elements":[
-									{
-										"name": "Name",
-										"label": "Name",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "Type",
-										"label": "Resource Group",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {}
-									}
-								]
-							}
-						],
-						"outputs": {
-							"Name": "[steps('basic').Name]",
-							"ResourceGroup": "[steps('basic').Type]"
-						}
-					}
-				},
-				"commands": [],
-				"columns": [
-					{
-						"key": "name",
-						"displayName": "Name"
-					},
-					{
-						"key": "location",
-						"displayName": "Location"
-					},
-					{
-						"key": "properties.provisioningState",
-						"displayName": "Status"
-					}
-				]
-			}
-		},
+		},		
 		{
 			"kind": "CustomResources",
 			"properties": {
@@ -933,6 +930,48 @@
 										"label": "Value",
 										"type": "Microsoft.Common.TextBox",
 										"defaultValue": "",
+										"constraints": {
+											"required": true
+										}
+									}
+								]
+							}
+						],
+						"outputs": {
+							"Key": "[steps('basic').Name]",
+							"Value": "[steps('basic').Value]"
+						}
+					}
+				},
+				"editUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters":
+					{
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements":[
+									{
+										"name": "Name",
+										"label": "Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"defaultValuePath": "properties.Key",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "Value",
+										"label": "Value",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"defaultValuePath": "properties.Value",
 										"constraints": {
 											"required": true
 										}
@@ -1002,6 +1041,63 @@
 										"label": "OS",
 										"type": "Microsoft.Common.TextBox",
 										"defaultValue": ""
+									},
+									{
+										"name": "Base64UserData",
+										"label": "User Data",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": ""
+									}
+								]
+							}
+						],
+						"outputs": {
+							"Name": "[steps('basic').Name]",
+							"ImageId": "[steps('basic').ImageId]",
+							"OS": "[steps('basic').OS]",
+							"Base64UserData": "[steps('basic').Base64UserData]"
+						}
+					}
+				},
+				"editUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters":
+					{
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements":[
+									{
+										"name": "Name",
+										"label": "Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"defaultValuePath": "properties.Name",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "ImageId",
+										"label": "Image Id",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"defaultValuePath": "properties.ImageId",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "OS",
+										"label": "OS",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"defaultValuePath": "properties.OS"
 									},
 									{
 										"name": "Base64UserData",
