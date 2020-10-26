@@ -962,6 +962,192 @@
 					}
 				]
 			}
+		},
+		{
+			"kind": "CustomResources",
+			"properties": {
+				"displayName": "Scheduled Tasks",
+				"version": "1.0.0.0",
+				"resourceType": "ScheduledTasks",
+				"createUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters": {
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements": [
+									{
+										"name": "subscriptionsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "GET",
+											"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
+										}
+									},
+									{
+										"name": "subscriptionDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Subscriptions",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "resourceGroupsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "GET",
+											"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
+										}
+									},
+									{
+										"name": "resourceGroupDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Resource Groups",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duplomgapp-mgr-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duplomgapp-mgr-', ''), '\",\"value\":\"', item.name, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "vmListApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"body": {
+												"BackendUrl": "GetAsyncNativeHosts",
+												"Method": "GET"
+											}
+										}	
+									},
+									{
+										"name": "VmName",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Virtual Machine",
+										"toolTip": "Choose one of the Virtual Machine",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').vmListApi.value, (item) => parse(concat('{\"label\":\"', item.FriendlyName, '\",\"value\":\"', item.FriendlyName, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "TaskType",
+										"label": "Task Action",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": 1,
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Stop",
+													"value": 1
+												},
+												{
+													"label": "Start",
+													"value": 2
+												},
+												{
+													"label": "Backup",
+													"value": 0
+												}
+											]
+										}
+									},
+									{
+										"name": "DaysOfWeek",
+										"label": "Days Of Week",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Sunday",
+													"value": "sun"
+												},
+												{
+													"label": "Monday",
+													"value": "mon"
+												},
+												{
+													"label": "Tuesday",
+													"value": "tue"
+												},
+												{
+													"label": "Wednesday",
+													"value": "wed"
+												},												{
+													"label": "Thursday",
+													"value": "thu"
+												},
+												{
+													"label": "Friday",
+													"value": "fri"
+												},
+												{
+													"label": "Saturday",
+													"value": "sat"
+												}
+											]
+										}
+									},
+									{
+										"name": "TimeOfDay",
+										"label": "Time Of Day",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "00:00:00",
+										"toolTip": "Format of time in HH:MM:SS",
+										"constraints": {
+											"required": true
+										}
+									}
+								]
+							}
+						],
+						"outputs": {
+							"ComponentId": "[steps('basic').VmName]",
+							"TaskType": "[steps('basic').TaskType]",
+							"Cloud": 2,
+							"TimeOfDay": "[steps('basic').TimeOfDay]",
+							"DaysOfWeek": "[steps('basic').DaysOfWeek]"
+						}
+					}
+				},
+				"commands": [
+				],
+				"columns": [
+					{
+						"key": "name",
+						"displayName": "Name"
+					},
+					{
+						"key": "properties.ComponentId",
+						"displayName": "Virtual Machine"
+					},
+					{
+						"key": "properties.TaskType",
+						"displayName": "Task Type"
+					},
+					{
+						"key": "properties.DaysOfWeek",
+						"displayName": "Days Of Week"
+					},
+					{
+						"key": "properties.TimeOfDay",
+						"displayName": "Time Of Day"
+					}
+				]
+			}
 		}
 	]
 }

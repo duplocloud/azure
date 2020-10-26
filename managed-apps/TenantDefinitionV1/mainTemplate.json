@@ -54,6 +54,11 @@
                         "name": "ProtectedVM",
                         "routingType": "Proxy",
                         "endpoint": "https://incloud.duplocloud.net/InvokeAzureRp"
+                    },
+                    {
+                        "name": "ScheduledTasks",
+                        "routingType": "Proxy",
+                        "endpoint": "https://incloud.duplocloud.net/InvokeAzureRp"
                     }
                 ]
             }
