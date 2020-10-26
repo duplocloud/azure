@@ -1,1062 +1,1025 @@
-{
-	"views": [
-		{
-			"kind": "Overview",
-			"properties": {
-				"header": "DuploCloud Infra",
-				"description": "Network components like Vnet , Subnet , NSG are managed here",
-				"commands": []
-			}
-		},
-		{
-			"kind": "CustomResources",
-			"properties": {
-				"displayName": "Infrastructure",
-				"version": "1.0.0.0",
-				"resourceType": "Infrastructure",
-				"commands": [],
-				"columns": [
-					{
-						"key": "properties.Name",
-						"displayName": "Name"
-					},
-					{
-						"key": "properties.Region",
-						"displayName": "Region"
-					},
-					{
-						"key": "properties.Vnet.AddressPrefix",
-						"displayName": "AddressPrefix"
-					},
-					{
-						"key": "properties.ProvisioningStatus",
-						"displayName": "Status"
-					},
-					{
-						"key": "properties.LogAnalyticsConfig.Name",
-						"displayName": "Log Analytics Workspace"
-					},
-					{
-						"key": "properties.RecoveryVaultConfig.Name",
-						"displayName": "Vault Config"
-					},
-					{
-						"key": "properties.AksConfig.Name",
-						"displayName": "AKS Cluster"
-					}
-				]
-			}
-		},
-		{
-			"kind": "CustomResources",
-			"properties": {
-				"displayName": "Subnet",
-				"version": "1.0.0.0",
-				"resourceType": "Subnet",
-				"createUIDefinition": {
-					"handler": "Microsoft.Azure.CreateUIDef",
-					"parameters": 
-					{
-						"config": {
-							"isWizard": true
-						},
-						"basics": [],
-						"steps": [
-							{
-								"name": "basic",
-								"label": "Basic",
-								"elements":[
-									{
-										"name": "name",
-										"label": "Name",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "AddressPrefix",
-										"label": "Address Prefix",
-										"type": "Microsoft.Common.TextBox",
-										"placeholder": "10.50.1.0/24",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "SubnetType",
-										"type": "Microsoft.Common.DropDown",
-										"label": "Subnet Type",
-										"defaultValue": "none",
-										"constraints": {
-											"allowedValues": [
-												{
-													"label": "None",
-													"value": "none"
-												},
-												{
-													"label": "Application Gateway",
-													"value": "appgwsubnet"
-												},
-												{
-													"label": "Application Service Env",
-													"value": "appserviceenv"
+	{
+		"views": [
+			{
+				"kind": "Overview",
+				"properties": {
+					"header": "DuploCloud Infra",
+					"description": "Network components like Vnet , Subnet , NSG are managed here",
+					"commands": []
+				}
+			},
+			{
+				"kind": "CustomResources",
+				"properties": {
+					"displayName": "Infrastructure",
+					"version": "1.0.0.0",
+					"resourceType": "Infrastructure",
+					"editUIDefinition": {
+						"handler": "Microsoft.Azure.CreateUIDef",
+						"parameters":
+						{
+							"config": {
+								"isWizard": true
+							},
+							"basics": [],
+							"steps": [
+								{
+									"name": "basic",
+									"label": "Basic",
+									"elements":[
+										{
+													"name": "updateComponentDropDown",
+													"type": "Microsoft.Common.DropDown",
+													"label": "Component to Update",
+													"placeholder": "",
+													"toolTip": "Choose a Component to Update",
+													"constraints": {
+														"allowedValues": [
+															{
+																"label": "Log Analytics",
+																"value": "LogAnalytics"
+															},
+															{
+																"label": "Recovery Vault",
+																"value": "RecoveryVault"
+															},
+															{
+																"label": "AKS Cluster",
+																"value": "AksCluster"
+															}
+														],
+														"required": true
 													},
-												{
-													"label": "Managed Instance",
-													"value": "managedinstance"
-												},
-												{
-													"label": "Azure Bastion Subnet",
-													"value": "azurebastionsubnet"
-												}
-											]
+													"visible": true
+									  },
+										{
+											"name": "LgWsMessage",
+											"type": "Microsoft.Common.InfoBox",
+											"visible": "[and(equals(steps('basic').updateComponentDropDown, 'LogAnalytics'), equals(steps('basic').LgWsName, ''))]",
+											"options": {
+												"icon": "None",
+												"text": "Log Analytics workspace has not been setup. Enter the following information to setup the workspace.",
+												"uri": "https://www.microsoft.com"
+											}
+										},
+										{
+											"name": "LgWsName",
+											"label": "Workspace Name",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValuePath": "properties.LogAnalyticsConfig.Name",
+											"constraints": {},
+											"visible": "[equals(steps('basic').updateComponentDropDown, 'LogAnalytics')]"
+										},
+										{
+											"name": "LgWsRgName",
+											"label": "Resource Group",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValuePath": "properties.LogAnalyticsConfig.ResourceGroup",
+											"constraints": {},
+											"visible": "[equals(steps('basic').updateComponentDropDown, 'LogAnalytics')]"
+										},		
+										{
+											"name": "RecoveryVaultConfigMessage",
+											"type": "Microsoft.Common.InfoBox",
+											"visible": "[and(equals(steps('basic').updateComponentDropDown, 'RecoveryVault'), equals(steps('basic').RecoveryVaultConfigName, ''))]",
+											"options": {
+												"icon": "None",
+												"text": "Recovery Vault config has not been set. Enter the following information to setup the config.",
+												"uri": "https://www.microsoft.com"
+											}
+										},										
+										{
+											"name": "RecoveryVaultConfigName",
+											"label": "Recovery Vault Name",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValuePath": "properties.RecoveryVaultConfig.Name",
+											"constraints": {},
+											"visible": "[equals(steps('basic').updateComponentDropDown, 'RecoveryVault')]"
+										},
+										{
+											"name": "RecoveryVaultConfigRg",
+											"label": "Resource Group",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValuePath": "properties.RecoveryVaultConfig.ResourceGroup",
+											"constraints": {},
+											"visible": "[equals(steps('basic').updateComponentDropDown, 'RecoveryVault')]"
+										},
+										{
+											"name": "AksClusterMessage",
+											"type": "Microsoft.Common.InfoBox",
+											"options": {
+												"icon": "None",
+												"text": "AKS Cluster has not been setup. Enter the following information to setup the cluster.",
+												"uri": "https://www.microsoft.com"
+											},
+											"visible": "[and(equals(steps('basic').updateComponentDropDown, 'AksCluster'), equals(steps('basic').AksClusterName, ''))]"
+										},
+										{
+											"name": "AksClusterName",
+											"label": "Cluster Name",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValuePath": "properties.AksConfig.Name",
+											"constraints": {},
+											"visible": "[equals(steps('basic').updateComponentDropDown, 'AksCluster')]"
+										},
+										{
+											"name": "AksClusterSize",
+											"label": "VM Size",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValuePath": "properties.AksConfig.VmSize",
+											"constraints": {},
+											"visible": "[equals(steps('basic').updateComponentDropDown, 'AksCluster')]"
 										}
-									},
-									{
-										"name": "ServiceEndpoints",
-										"type": "Microsoft.Common.DropDown",
-										"label": "Service Endpoints",
-										"placeholder": "Select Service Endpoints.",
-										"multiselect": true,
-										"constraints": {
-											"allowedValues": [
-												{
-													"label": "Microsoft.Storage",
-													"value": "Microsoft.Storage"
-												},
-												{
-													"label": "Microsoft.Sql",
-													"value": "Microsoft.Sql"
-												}
-											]
-										}
-									}
-								]
+									]
+								}
+							],
+							"outputs": {
+								"updateType": "[if(equals(steps('basic').updateComponentDropDown, 'LogAnalytics'), 'LogAnalyticsWsUpdate', 'VaultConfigUpdate')]",
+								"Name": "[if(equals(steps('basic').updateComponentDropDown, 'LogAnalytics'), steps('basic').LgWsName, steps('basic').RecoveryVaultConfigName)]",
+								"ResourceGroup": "[if(equals(steps('basic').updateComponentDropDown, 'LogAnalytics'), steps('basic').LgWsRgName, steps('basic').RecoveryVaultConfigRg)]"
 							}
-						],
-						"outputs": {
-							"NameEx": "[steps('basic').name]",
-							"AddressPrefix": "[steps('basic').AddressPrefix]",
-							"SubnetType": "[steps('basic').SubnetType]",
-							"ServiceEndpoints": "[steps('basic').ServiceEndpoints]"
 						}
-					}
-				},
-				"commands": [],
-				"columns": [
-					{
-						"key": "properties.NameEx",
-						"displayName": "Name"
 					},
-					{
-						"key": "properties.AddressPrefix",
-						"displayName": "AddressPrefix"
-					}
-				]
-			}
-		},
-		{
-			"kind": "CustomResources",
-			"properties": {
-				"displayName": "Backup policies",
-				"version": "1.0.0.0",
-				"resourceType": "VaultBackupPolicies",
-				"createUIDefinition": {
-					"handler": "Microsoft.Azure.CreateUIDef",
-					"parameters": 
-					{
-						"config": {
-							"isWizard": true
+					"commands": [],
+					"columns": [
+						{
+							"key": "properties.Name",
+							"displayName": "Name"
 						},
-						"basics": [],
-						"steps": [
-							{
-								"name": "basic",
-								"label": "Basic",
-								"elements":[
-									{
-										"name": "name",
-										"label": "Policy Name",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
+						{
+							"key": "properties.Region",
+							"displayName": "Region"
+						},
+						{
+							"key": "properties.Vnet.AddressPrefix",
+							"displayName": "AddressPrefix"
+						},
+						{
+							"key": "properties.ProvisioningStatus",
+							"displayName": "Status"
+						},
+						{
+							"key": "properties.LogAnalyticsConfig.Name",
+							"displayName": "Log Analytics Workspace"
+						},
+						{
+							"key": "properties.RecoveryVaultConfig.Name",
+							"displayName": "Vault Config"
+						},
+						{
+							"key": "properties.AksConfig.Name",
+							"displayName": "AKS Cluster"
+						}
+					]
+				}
+			},
+			{
+				"kind": "CustomResources",
+				"properties": {
+					"displayName": "Subnet",
+					"version": "1.0.0.0",
+					"resourceType": "Subnet",
+					"createUIDefinition": {
+						"handler": "Microsoft.Azure.CreateUIDef",
+						"parameters": 
+						{
+							"config": {
+								"isWizard": true
+							},
+							"basics": [],
+							"steps": [
+								{
+									"name": "basic",
+									"label": "Basic",
+									"elements":[
+										{
+											"name": "name",
+											"label": "Name",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "",
+											"constraints": {
+												"required": true
+											}
+										},
+										{
+											"name": "AddressPrefix",
+											"label": "Address Prefix",
+											"type": "Microsoft.Common.TextBox",
+											"placeholder": "10.50.1.0/24",
+											"defaultValue": "",
+											"constraints": {
+												"required": true
+											}
+										},
+										{
+											"name": "SubnetType",
+											"type": "Microsoft.Common.DropDown",
+											"label": "Subnet Type",
+											"defaultValue": "none",
+											"constraints": {
+												"allowedValues": [
+													{
+														"label": "None",
+														"value": "none"
+													},
+													{
+														"label": "Application Gateway",
+														"value": "appgwsubnet"
+													},
+													{
+														"label": "Application Service Env",
+														"value": "appserviceenv"
+														},
+													{
+														"label": "Managed Instance",
+														"value": "managedinstance"
+													},
+													{
+														"label": "Azure Bastion Subnet",
+														"value": "azurebastionsubnet"
+													}
+												]
+											}
+										},
+										{
+											"name": "ServiceEndpoints",
+											"type": "Microsoft.Common.DropDown",
+											"label": "Service Endpoints",
+											"placeholder": "Select Service Endpoints.",
+											"multiselect": true,
+											"constraints": {
+												"allowedValues": [
+													{
+														"label": "Microsoft.Storage",
+														"value": "Microsoft.Storage"
+													},
+													{
+														"label": "Microsoft.Sql",
+														"value": "Microsoft.Sql"
+													}
+												]
+											}
 										}
-									},
-									{
-										"name": "schedule",
-										"type": "Microsoft.Common.Section",
-										"label": "Backup Schedule",
-										"elements": [
-											{
-												"name": "frequency",
-												"type": "Microsoft.Common.DropDown",
-												"label": "Frequency",
-												"placeholder": "",
-												"defaultValue": "Daily",
-												"toolTip": "",
-												"constraints": {
-													"allowedValues": [
-														{
-															"label": "Daily",
-															"value": "Daily"
-														},
-														{
-															"label": "Weekly",
-															"value": "Weekly"
-														}
-													],
-													"required": true
-												},
-												"visible": true
-											},
-											{
-												"name": "time",
-												"type": "Microsoft.Common.DropDown",
-												"label": "Time",
-												"placeholder": "",
-												"defaultValue": 0,
-												"toolTip": "",
-												"constraints": {
-													"allowedValues": [
-														{
-															"label": "12:00AM",
-															"value": 0
-														},
-														{
-															"label": "12:30AM",
-															"value": 30
-														}
-													],
-													"required": true
-												},
-												"visible": true
-											},
-											{
-												"name": "timezone",
-												"type": "Microsoft.Common.DropDown",
-												"label": "Time Zone",
-												"placeholder": "",
-												"defaultValue": "UTC",
-												"toolTip": "",
-												"constraints": {
-													"allowedValues": [
-														{
-															"label": "UTC",
-															"value": "UTC"
-														},
-														{
-															"label": "PST",
-															"value": "PST"
-														}
-													],
-													"required": true
-												},
-												"visible": true
-											}
-										],
-										"visible": true
-									},
-									{
-										"name": "restore",
-										"type": "Microsoft.Common.Section",
-										"label": "Instant Restore",
-										"elements": [
-											{
-												"name": "days",
-												"type": "Microsoft.Common.TextBox",
-												"defaultValue": "2",
-												"label": "Retain instant recovery snapshot(s) for Days"
-											}
-										],
-										"visible": true
-									},
-									{
-										"name": "retention",
-										"type": "Microsoft.Common.Section",
-										"label": "Retention Range",
-										"elements": [
-											{
-												"name": "dailyretention",
-												"type": "Microsoft.Common.TextBox",
-												"defaultValue": "180",
-												"label": "Retention of daily backup points(days)"
-											}
-										],
-										"visible": true
-									}
-								]
+									]
+								}
+							],
+							"outputs": {
+								"NameEx": "[steps('basic').name]",
+								"AddressPrefix": "[steps('basic').AddressPrefix]",
+								"SubnetType": "[steps('basic').SubnetType]",
+								"ServiceEndpoints": "[steps('basic').ServiceEndpoints]"
 							}
-						],
-						"outputs": {
-							"name": "[steps('basic').name]",
-							"properties": {
-								"backupManagementType": "AzureIaasVM",
-								"timeZone": "Pacific Standard Time",
-								"instantRpRetentionRangeInDays": "[int(steps('basic').restore.days)]",
-								"schedulePolicy": {
-									"schedulePolicyType": "SimpleSchedulePolicy",
-									"scheduleRunFrequency": "[steps('basic').schedule.frequency]",
-									"scheduleRunTimes": "[split(addMinutes('1990-12-31T00:00:00Z', int(steps('basic').schedule.time)), '*')]"
-								},
-								"retentionPolicy": {
-									"retentionPolicyType": "LongTermRetentionPolicy",
-									"dailySchedule": {
-										"retentionTimes": "[split(addMinutes('1990-12-31T00:00:00Z', int(steps('basic').schedule.time)), '*')]",
-										"retentionDuration": {
-											"count": "[int(steps('basic').retention.dailyretention)]",
-											"durationType": "Days"
+						}
+					},
+					"commands": [],
+					"columns": [
+						{
+							"key": "properties.NameEx",
+							"displayName": "Name"
+						},
+						{
+							"key": "properties.AddressPrefix",
+							"displayName": "AddressPrefix"
+						}
+					]
+				}
+			},
+			{
+				"kind": "CustomResources",
+				"properties": {
+					"displayName": "Backup policies",
+					"version": "1.0.0.0",
+					"resourceType": "VaultBackupPolicies",
+					"createUIDefinition": {
+						"handler": "Microsoft.Azure.CreateUIDef",
+						"parameters": 
+						{
+							"config": {
+								"isWizard": true
+							},
+							"basics": [],
+							"steps": [
+								{
+									"name": "basic",
+									"label": "Basic",
+									"elements":[
+										{
+											"name": "name",
+											"label": "Policy Name",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "",
+											"constraints": {
+												"required": true
+											}
+										},
+										{
+											"name": "schedule",
+											"type": "Microsoft.Common.Section",
+											"label": "Backup Schedule",
+											"elements": [
+												{
+													"name": "frequency",
+													"type": "Microsoft.Common.DropDown",
+													"label": "Frequency",
+													"placeholder": "",
+													"defaultValue": "Daily",
+													"toolTip": "",
+													"constraints": {
+														"allowedValues": [
+															{
+																"label": "Daily",
+																"value": "Daily"
+															},
+															{
+																"label": "Weekly",
+																"value": "Weekly"
+															}
+														],
+														"required": true
+													},
+													"visible": true
+												},
+												{
+													"name": "time",
+													"type": "Microsoft.Common.DropDown",
+													"label": "Time",
+													"placeholder": "",
+													"defaultValue": 0,
+													"toolTip": "",
+													"constraints": {
+														"allowedValues": [
+															{
+																"label": "12:00AM",
+																"value": 0
+															},
+															{
+																"label": "12:30AM",
+																"value": 30
+															}
+														],
+														"required": true
+													},
+													"visible": true
+												},
+												{
+													"name": "timezone",
+													"type": "Microsoft.Common.DropDown",
+													"label": "Time Zone",
+													"placeholder": "",
+													"defaultValue": "UTC",
+													"toolTip": "",
+													"constraints": {
+														"allowedValues": [
+															{
+																"label": "UTC",
+																"value": "UTC"
+															},
+															{
+																"label": "PST",
+																"value": "PST"
+															}
+														],
+														"required": true
+													},
+													"visible": true
+												}
+											],
+											"visible": true
+										},
+										{
+											"name": "restore",
+											"type": "Microsoft.Common.Section",
+											"label": "Instant Restore",
+											"elements": [
+												{
+													"name": "days",
+													"type": "Microsoft.Common.TextBox",
+													"defaultValue": "2",
+													"label": "Retain instant recovery snapshot(s) for Days"
+												}
+											],
+											"visible": true
+										},
+										{
+											"name": "retention",
+											"type": "Microsoft.Common.Section",
+											"label": "Retention Range",
+											"elements": [
+												{
+													"name": "dailyretention",
+													"type": "Microsoft.Common.TextBox",
+													"defaultValue": "180",
+													"label": "Retention of daily backup points(days)"
+												}
+											],
+											"visible": true
+										}
+									]
+								}
+							],
+							"outputs": {
+								"name": "[steps('basic').name]",
+								"properties": {
+									"backupManagementType": "AzureIaasVM",
+									"timeZone": "Pacific Standard Time",
+									"instantRpRetentionRangeInDays": "[int(steps('basic').restore.days)]",
+									"schedulePolicy": {
+										"schedulePolicyType": "SimpleSchedulePolicy",
+										"scheduleRunFrequency": "[steps('basic').schedule.frequency]",
+										"scheduleRunTimes": "[split(addMinutes('1990-12-31T00:00:00Z', int(steps('basic').schedule.time)), '*')]"
+									},
+									"retentionPolicy": {
+										"retentionPolicyType": "LongTermRetentionPolicy",
+										"dailySchedule": {
+											"retentionTimes": "[split(addMinutes('1990-12-31T00:00:00Z', int(steps('basic').schedule.time)), '*')]",
+											"retentionDuration": {
+												"count": "[int(steps('basic').retention.dailyretention)]",
+												"durationType": "Days"
+											}
 										}
 									}
 								}
 							}
 						}
-					}
-				},
-				"editUIDefinition": {
-					"handler": "Microsoft.Azure.CreateUIDef",
-					"parameters": 
-					{
-						"config": {
-							"isWizard": true
+					},
+					"commands": [],
+					"columns": [
+						{
+							"key": "name",
+							"displayName": "Name"
 						},
-						"basics": [],
-						"steps": [
-							{
-								"name": "basic",
-								"label": "Basic",
-								"elements":[
-									{
-										"name": "name",
-										"label": "Policy Name",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "schedule",
-										"type": "Microsoft.Common.Section",
-										"label": "Backup Schedule",
-										"elements": [
-											{
-												"name": "frequency",
-												"type": "Microsoft.Common.DropDown",
-												"label": "Frequency",
-												"placeholder": "",
-												"defaultValue": "Daily",
-												"toolTip": "",
-												"constraints": {
-													"allowedValues": [
-														{
-															"label": "Daily",
-															"value": "Daily"
-														},
-														{
-															"label": "Weekly",
-															"value": "Weekly"
-														}
-													],
-													"required": true
-												},
-												"visible": true
+						{
+							"key": "properties.schedulePolicy.scheduleRunFrequency",
+							"displayName": "Frequency"
+						},
+						{
+							"key": "properties.schedulePolicy.scheduleRunTimes",
+							"displayName": "Schedule"
+						},
+						{
+							"key": "properties.retentionPolicy.dailySchedule.retentionDuration.count",
+							"displayName": "Retention (Days)"
+						}
+					]
+				}
+			},
+			{
+				"kind": "CustomResources",
+				"properties": {
+					"displayName": "NSG Rules",
+					"version": "1.0.0.0",
+					"resourceType": "NSGRule",
+					"createUIDefinition": {
+						"handler": "Microsoft.Azure.CreateUIDef",
+						"parameters":
+						{
+							"config": {
+								"isWizard": true
+							},
+							"basics": [],
+							"steps": [
+								{
+									"name": "basic",
+									"label": "Basic",
+									"elements":[
+										{
+											"name": "subscriptionsApi",
+											"type": "Microsoft.Solutions.ArmApiControl",
+											"request": {
+												"method": "GET",
+												"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
+											}
+										},
+										{
+											"name": "subscriptionDropDown",
+											"type": "Microsoft.Common.DropDown",
+											"label": "Subscriptions",
+											"toolTip": "",
+											"constraints": {
+												"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
+												"required": true
 											},
-											{
-												"name": "time",
-												"type": "Microsoft.Common.DropDown",
-												"label": "Time",
-												"placeholder": "",
-												"defaultValue": 0,
-												"toolTip": "",
-												"constraints": {
-													"allowedValues": [
-														{
-															"label": "12:00AM",
-															"value": 0
-														},
-														{
-															"label": "12:30AM",
-															"value": 30
-														}
-													],
-													"required": true
-												},
-												"visible": true
+											"visible": true
+										},
+										{
+											"name": "resourceGroupsApi",
+											"type": "Microsoft.Solutions.ArmApiControl",
+											"request": {
+												"method": "GET",
+												"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
+											}
+										},
+										{
+											"name": "resourceGroupDropDown",
+											"type": "Microsoft.Common.DropDown",
+											"label": "Managed App",
+											"toolTip": "",
+											"constraints": {
+												"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duploinfra-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duploinfra-', ''), '\",\"value\":\"', item.name, '\"}')))]",
+												"required": true
 											},
-											{
-												"name": "timezone",
-												"type": "Microsoft.Common.DropDown",
-												"label": "Time Zone",
-												"placeholder": "",
-												"defaultValue": "UTC",
-												"toolTip": "",
-												"constraints": {
-													"allowedValues": [
-														{
-															"label": "UTC",
-															"value": "UTC"
-														},
-														{
-															"label": "PST",
-															"value": "PST"
+											"visible": true
+										},
+										{
+											"name": "nsgApi",
+											"type": "Microsoft.Solutions.ArmApiControl",
+											"request": {
+												"method": "POST",
+												"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
+												"body": {
+													"BackendUrl": "GetInfraSecurityGroups/<InfraName>",
+													"Method": "GET"
+												}
+											}	
+										},
+										{
+											"name": "Name",
+											"label": "Name",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "",
+											"constraints": {
+												"required": true
+											}
+										},
+										{
+											"name": "NSGName",
+											"type": "Microsoft.Common.DropDown",
+											"label": "NSG name",
+											"toolTip": "Choose one of the NSG",
+											"constraints": {
+												"allowedValues": "[map(steps('basic').nsgApi.value, (item) => parse(concat('{\"label\":\"', item.Name, '\",\"value\":\"', item.Name, '\"}')))]",
+												"required": true
+											},
+											"visible": true
+										},
+										{
+											"name": "SrcRuleType",
+											"type": "Microsoft.Common.DropDown",
+											"label": "Source Type",
+											"defaultValue": 0,
+											"constraints": {
+												"allowedValues": [
+													{
+														"label": "IP Address",
+														"value": 0
+													},
+													{
+														"label": "Service Tag",
+														"value": 1
+													},
+													{
+														"label": "Application security group",
+														"value": 2
 														}
-													],
-													"required": true
-												},
-												"visible": true
+												]
 											}
-										],
-										"visible": true
-									},
-									{
-										"name": "restore",
-										"type": "Microsoft.Common.Section",
-										"label": "Instant Restore",
-										"elements": [
-											{
-												"name": "days",
-												"type": "Microsoft.Common.TextBox",
-												"defaultValue": "2",
-												"label": "Retain instant recovery snapshot(s) for Days"
+										},
+										{
+											"name": "SrcAddressPrefix",
+											"label": "Source",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "*",
+											"constraints": {
+												"required": true
 											}
-										],
-										"visible": true
-									},
-									{
-										"name": "retention",
-										"type": "Microsoft.Common.Section",
-										"label": "Retention Range",
-										"elements": [
-											{
-												"name": "dailyretention",
-												"type": "Microsoft.Common.TextBox",
-												"defaultValue": "180",
-												"label": "Retention of daily backup points(days)"
+										},
+										{
+											"name": "SourcePortRange",
+											"label": "Source Port Range",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "*",
+											"constraints": {
+												"required": true
 											}
-										],
-										"visible": true
-									}
-								]
-							}
-						],
-						"outputs": {
-							"name": "[steps('basic').name]",
-							"properties": {
-								"backupManagementType": "AzureIaasVM",
-								"timeZone": "Pacific Standard Time",
-								"instantRpRetentionRangeInDays": "[int(steps('basic').restore.days)]",
-								"schedulePolicy": {
-									"schedulePolicyType": "SimpleSchedulePolicy",
-									"scheduleRunFrequency": "[steps('basic').schedule.frequency]",
-									"scheduleRunTimes": "[split(addMinutes('1990-12-31T00:00:00Z', int(steps('basic').schedule.time)), '*')]"
-								},
-								"retentionPolicy": {
-									"retentionPolicyType": "LongTermRetentionPolicy",
-									"dailySchedule": {
-										"retentionTimes": "[split(addMinutes('1990-12-31T00:00:00Z', int(steps('basic').schedule.time)), '*')]",
-										"retentionDuration": {
-											"count": "[int(steps('basic').retention.dailyretention)]",
-											"durationType": "Days"
+										},
+										{
+											"name": "DstRuleType",
+											"type": "Microsoft.Common.DropDown",
+											"label": "Destination Type",
+											"defaultValue": 0,
+											"constraints": {
+												"allowedValues": [
+													{
+														"label": "IP Address",
+														"value": 0
+													},
+													{
+														"label": "Service Tag",
+														"value": 1
+													},
+													{
+														"label": "Application security group",
+														"value": 2
+														}
+												]
+											}
+										},
+										{
+											"name": "DstAddressPrefix",
+											"label": "Destination",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "*",
+											"constraints": {
+												"required": true
+											}
+										},
+										{
+											"name": "DestinationPortRange",
+											"label": "Destination Port Range",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "",
+											"constraints": {
+												"required": true
+											}
+										},
+										{
+											"name": "Protocol",
+											"type": "Microsoft.Common.DropDown",
+											"label": "Protocol",
+											"defaultValue": "*",
+											"constraints": {
+												"allowedValues": [
+													{
+														"label": "Both",
+														"value": "*"
+													},
+													{
+														"label": "TCP",
+														"value": "tcp"
+													},
+													{
+														"label": "UDP",
+														"value": "udp"
+													}
+												]
+											}
+										},
+										{
+											"name": "Direction",
+											"type": "Microsoft.Common.DropDown",
+											"label": "Direction",
+											"defaultValue": "Inbound",
+											"constraints": {
+												"allowedValues": [
+													{
+														"label": "Inbound",
+														"value": "Inbound"
+													},
+													{
+														"label": "Outbound",
+														"value": "Outbound"
+													}
+												]
+											}
+										},
+										{
+											"name": "RuleAction",
+											"type": "Microsoft.Common.DropDown",
+											"label": "RuleAction",
+											"defaultValue": "Allow",
+											"constraints": {
+												"allowedValues": [
+													{
+														"label": "Allow",
+														"value": "Allow"
+													},
+													{
+														"label": "Deny",
+														"value": "Deny"
+													}
+												]
+											}
+										},
+										{
+											"name": "Priority",
+											"label": "Priority",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "",
+											"constraints": {
+												"required": true
+											}
 										}
-									}
+									]
 								}
+							],
+							"outputs": {
+								"Name": "[steps('basic').Name]",
+								"NSGName": "[steps('basic').NSGName]",
+								"SrcAddressPrefix": "[steps('basic').SrcAddressPrefix]",
+								"DstAddressPrefix": "[steps('basic').DstAddressPrefix]",
+								"SourcePortRange": "[steps('basic').SourcePortRange]",
+								"DestinationPortRange": "[steps('basic').DestinationPortRange]",
+								"Protocol": "[steps('basic').Protocol]",
+								"Direction": "[steps('basic').Direction]",
+								"RuleAction": "[steps('basic').RuleAction]",
+								"Priority": "[steps('basic').Priority]",
+								"SrcRuleType": "[steps('basic').SrcRuleType]",
+								"DstRuleType": "[steps('basic').DstRuleType]"
 							}
 						}
-					}
-				},
-				"commands": [],
-				"columns": [
-					{
-						"key": "name",
-						"displayName": "Name"
 					},
-					{
-						"key": "properties.schedulePolicy.scheduleRunFrequency",
-						"displayName": "Frequency"
-					}
-				]
-			}
-		},
-		{
-			"kind": "CustomResources",
-			"properties": {
-				"displayName": "NSG Rules",
-				"version": "1.0.0.0",
-				"resourceType": "NSGRule",
-				"createUIDefinition": {
-					"handler": "Microsoft.Azure.CreateUIDef",
-					"parameters":
-					{
-						"config": {
-							"isWizard": true
+					"commands": [
+					],
+					"columns": [
+						{
+							"key": "properties.NSGName",
+							"displayName": "NSG Name"
 						},
-						"basics": [],
-						"steps": [
-							{
-								"name": "basic",
-								"label": "Basic",
-								"elements":[
-									{
-										"name": "subscriptionsApi",
-										"type": "Microsoft.Solutions.ArmApiControl",
-										"request": {
-											"method": "GET",
-											"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
-										}
-									},
-									{
-										"name": "subscriptionDropDown",
-										"type": "Microsoft.Common.DropDown",
-										"label": "Subscriptions",
-										"toolTip": "",
-										"constraints": {
-											"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
-											"required": true
-										},
-										"visible": true
-									},
-									{
-										"name": "resourceGroupsApi",
-										"type": "Microsoft.Solutions.ArmApiControl",
-										"request": {
-											"method": "GET",
-											"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
-										}
-									},
-									{
-										"name": "resourceGroupDropDown",
-										"type": "Microsoft.Common.DropDown",
-										"label": "Managed App",
-										"toolTip": "",
-										"constraints": {
-											"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duploinfra-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duploinfra-', ''), '\",\"value\":\"', item.name, '\"}')))]",
-											"required": true
-										},
-										"visible": true
-									},
-									{
-										"name": "nsgApi",
-										"type": "Microsoft.Solutions.ArmApiControl",
-										"request": {
-											"method": "POST",
-											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
-											"body": {
-												"BackendUrl": "GetInfraSecurityGroups/<InfraName>",
-												"Method": "GET"
+						{
+							"key": "properties.Name",
+							"displayName": "Rule Name"
+						},
+						{
+							"key": "properties.Protocol",
+							"displayName": "Protocol"
+						},
+						{
+							"key": "properties.SrcAddressPrefix",
+							"displayName": "Source Address prefix"
+						},
+						{
+							"key": "properties.SourcePortRange",
+							"displayName": "Source Port Range"
+						},
+						{
+							"key": "properties.DstAddressPrefix",
+							"displayName": "Dest Address prefix"
+						},
+						{
+							"key": "properties.DestinationPortRange",
+							"displayName": "Dest Port Range"
+						},
+						{
+							"key": "properties.RuleAction",
+							"displayName": "Rule Action"
+						},
+						{
+							"key": "properties.Direction",
+							"displayName": "Direction"
+						},
+						{
+							"key": "properties.Priority",
+							"displayName": "Priority"
+						}
+					]
+				}
+			},		
+			{
+				"kind": "CustomResources",
+				"properties": {
+					"displayName": "Meta Data",
+					"version": "1.0.0.0",
+					"resourceType": "PlanConfigs",
+					"createUIDefinition": {
+						"handler": "Microsoft.Azure.CreateUIDef",
+						"parameters":
+						{
+							"config": {
+								"isWizard": true
+							},
+							"basics": [],
+							"steps": [
+								{
+									"name": "basic",
+									"label": "Basic",
+									"elements":[
+										{
+											"name": "Name",
+											"label": "Name",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "",
+											"constraints": {
+												"required": true
 											}
-										}	
-									},
-									{
-										"name": "Name",
-										"label": "Name",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "NSGName",
-										"type": "Microsoft.Common.DropDown",
-										"label": "NSG name",
-										"toolTip": "Choose one of the NSG",
-										"constraints": {
-											"allowedValues": "[map(steps('basic').nsgApi.value, (item) => parse(concat('{\"label\":\"', item.Name, '\",\"value\":\"', item.Name, '\"}')))]",
-											"required": true
 										},
-										"visible": true
-									},
-									{
-										"name": "SrcRuleType",
-										"type": "Microsoft.Common.DropDown",
-										"label": "Source Type",
-										"defaultValue": 0,
-										"constraints": {
-											"allowedValues": [
-												{
-													"label": "IP Address",
-													"value": 0
-												},
-												{
-													"label": "Service Tag",
-													"value": 1
-												},
-												{
-													"label": "Application security group",
-													"value": 2
-													}
-											]
+										{
+											"name": "Value",
+											"label": "Value",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "",
+											"constraints": {
+												"required": true
+											}
 										}
-									},
-									{
-										"name": "SrcAddressPrefix",
-										"label": "Source",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "*",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "SourcePortRange",
-										"label": "Source Port Range",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "*",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "DstRuleType",
-										"type": "Microsoft.Common.DropDown",
-										"label": "Destination Type",
-										"defaultValue": 0,
-										"constraints": {
-											"allowedValues": [
-												{
-													"label": "IP Address",
-													"value": 0
-												},
-												{
-													"label": "Service Tag",
-													"value": 1
-												},
-												{
-													"label": "Application security group",
-													"value": 2
-													}
-											]
-										}
-									},
-									{
-										"name": "DstAddressPrefix",
-										"label": "Destination",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "*",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "DestinationPortRange",
-										"label": "Destination Port Range",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "Protocol",
-										"type": "Microsoft.Common.DropDown",
-										"label": "Protocol",
-										"defaultValue": "*",
-										"constraints": {
-											"allowedValues": [
-												{
-													"label": "Both",
-													"value": "*"
-												},
-												{
-													"label": "TCP",
-													"value": "tcp"
-												},
-												{
-													"label": "UDP",
-													"value": "udp"
-												}
-											]
-										}
-									},
-									{
-										"name": "Direction",
-										"type": "Microsoft.Common.DropDown",
-										"label": "Direction",
-										"defaultValue": "Inbound",
-										"constraints": {
-											"allowedValues": [
-												{
-													"label": "Inbound",
-													"value": "Inbound"
-												},
-												{
-													"label": "Outbound",
-													"value": "Outbound"
-												}
-											]
-										}
-									},
-									{
-										"name": "RuleAction",
-										"type": "Microsoft.Common.DropDown",
-										"label": "RuleAction",
-										"defaultValue": "Allow",
-										"constraints": {
-											"allowedValues": [
-												{
-													"label": "Allow",
-													"value": "Allow"
-												},
-												{
-													"label": "Deny",
-													"value": "Deny"
-												}
-											]
-										}
-									},
-									{
-										"name": "Priority",
-										"label": "Priority",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									}
-								]
+									]
+								}
+							],
+							"outputs": {
+								"Key": "[steps('basic').Name]",
+								"Value": "[steps('basic').Value]"
 							}
-						],
-						"outputs": {
-							"Name": "[steps('basic').Name]",
-							"NSGName": "[steps('basic').NSGName]",
-							"SrcAddressPrefix": "[steps('basic').SrcAddressPrefix]",
-							"DstAddressPrefix": "[steps('basic').DstAddressPrefix]",
-							"SourcePortRange": "[steps('basic').SourcePortRange]",
-							"DestinationPortRange": "[steps('basic').DestinationPortRange]",
-							"Protocol": "[steps('basic').Protocol]",
-							"Direction": "[steps('basic').Direction]",
-							"RuleAction": "[steps('basic').RuleAction]",
-							"Priority": "[steps('basic').Priority]",
-							"SrcRuleType": "[steps('basic').SrcRuleType]",
-							"DstRuleType": "[steps('basic').DstRuleType]"
 						}
-					}
-				},
-				"commands": [
-				],
-				"columns": [
-					{
-						"key": "properties.NSGName",
-						"displayName": "NSG Name"
 					},
-					{
-						"key": "properties.Name",
-						"displayName": "Rule Name"
+					"editUIDefinition": {
+						"handler": "Microsoft.Azure.CreateUIDef",
+						"parameters":
+						{
+							"config": {
+								"isWizard": true
+							},
+							"basics": [],
+							"steps": [
+								{
+									"name": "basic",
+									"label": "Basic",
+									"elements":[
+										{
+											"name": "Name",
+											"label": "Name",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "",
+											"defaultValuePath": "properties.Key",
+											"constraints": {
+												"required": true
+											}
+										},
+										{
+											"name": "Value",
+											"label": "Value",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "",
+											"defaultValuePath": "properties.Value",
+											"constraints": {
+												"required": true
+											}
+										}
+									]
+								}
+							],
+							"outputs": {
+								"Key": "[steps('basic').Name]",
+								"Value": "[steps('basic').Value]"
+							}
+						}
 					},
-					{
-						"key": "properties.Protocol",
-						"displayName": "Protocol"
-					},
-					{
-						"key": "properties.SrcAddressPrefix",
-						"displayName": "Source Address prefix"
-					},
-					{
-						"key": "properties.SourcePortRange",
-						"displayName": "Source Port Range"
-					},
-					{
-						"key": "properties.DstAddressPrefix",
-						"displayName": "Dest Address prefix"
-					},
-					{
-						"key": "properties.DestinationPortRange",
-						"displayName": "Dest Port Range"
-					},
-					{
-						"key": "properties.RuleAction",
-						"displayName": "Rule Action"
-					},
-					{
-						"key": "properties.Direction",
-						"displayName": "Direction"
-					},
-					{
-						"key": "properties.Priority",
-						"displayName": "Priority"
-					}
-				]
-			}
-		},
-		{
-			"kind": "CustomResources",
-			"properties": {
-				"displayName": "Log Analytics Workspace",
-				"version": "1.0.0.0",
-				"resourceType": "LogAnalytics",
-				"createUIDefinition": {
-					"handler": "Microsoft.Azure.CreateUIDef",
-					"parameters":
-					{
-						"config": {
-							"isWizard": true
+					"commands": [
+					],
+					"columns": [
+						{
+							"key": "properties.Key",
+							"displayName": "Name"
 						},
-						"basics": [],
-						"steps": [
-							{
-								"name": "basic",
-								"label": "Basic",
-								"elements":[
-									{
-										"name": "Name",
-										"label": "Name",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "Type",
-										"label": "Resource Group",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {}
-									}
-								]
-							}
-						],
-						"outputs": {
-							"Name": "[steps('basic').Name]",
-							"ResourceGroup": "[steps('basic').Type]"
+						{
+							"key": "properties.Value",
+							"displayName": "Value"
 						}
-					}
-				},
-				"commands": [],
-				"columns": [
-					{
-						"key": "name",
-						"displayName": "Name"
+					]
+				}
+			},
+			{
+				"kind": "CustomResources",
+				"properties": {
+					"displayName": "Images",
+					"version": "1.0.0.0",
+					"resourceType": "Images",
+					"createUIDefinition": {
+						"handler": "Microsoft.Azure.CreateUIDef",
+						"parameters":
+						{
+							"config": {
+								"isWizard": true
+							},
+							"basics": [],
+							"steps": [
+								{
+									"name": "basic",
+									"label": "Basic",
+									"elements":[
+										{
+											"name": "Name",
+											"label": "Name",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "",
+											"constraints": {
+												"required": true
+											}
+										},
+										{
+											"name": "ImageId",
+											"label": "Image Id",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "",
+											"constraints": {
+												"required": true
+											}
+										},
+										{
+											"name": "OS",
+											"label": "OS",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": ""
+										},
+										{
+											"name": "Base64UserData",
+											"label": "User Data",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": ""
+										}
+									]
+								}
+							],
+							"outputs": {
+								"Name": "[steps('basic').Name]",
+								"ImageId": "[steps('basic').ImageId]",
+								"OS": "[steps('basic').OS]",
+								"Base64UserData": "[steps('basic').Base64UserData]"
+							}
+						}
 					},
-					{
-						"key": "location",
-						"displayName": "Location"
-					}
-				]
-			}
-		},
-		{
-			"kind": "CustomResources",
-			"properties": {
-				"displayName": "Recovery Services Vault",
-				"version": "1.0.0.0",
-				"resourceType": "VaultConfig",
-				"createUIDefinition": {
-					"handler": "Microsoft.Azure.CreateUIDef",
-					"parameters":
-					{
-						"config": {
-							"isWizard": true
+					"editUIDefinition": {
+						"handler": "Microsoft.Azure.CreateUIDef",
+						"parameters":
+						{
+							"config": {
+								"isWizard": true
+							},
+							"basics": [],
+							"steps": [
+								{
+									"name": "basic",
+									"label": "Basic",
+									"elements":[
+										{
+											"name": "Name",
+											"label": "Name",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "",
+											"defaultValuePath": "properties.Name",
+											"constraints": {
+												"required": true
+											}
+										},
+										{
+											"name": "ImageId",
+											"label": "Image Id",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "",
+											"defaultValuePath": "properties.ImageId",
+											"constraints": {
+												"required": true
+											}
+										},
+										{
+											"name": "OS",
+											"label": "OS",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": "",
+											"defaultValuePath": "properties.OS"
+										},
+										{
+											"name": "Base64UserData",
+											"label": "User Data",
+											"type": "Microsoft.Common.TextBox",
+											"defaultValue": ""
+										}
+									]
+								}
+							],
+							"outputs": {
+								"Name": "[steps('basic').Name]",
+								"ImageId": "[steps('basic').ImageId]",
+								"OS": "[steps('basic').OS]",
+								"Base64UserData": "[steps('basic').Base64UserData]"
+							}
+						}
+					},
+					"commands": [
+					],
+					"columns": [
+						{
+							"key": "properties.Name",
+							"displayName": "Name"
 						},
-						"basics": [],
-						"steps": [
-							{
-								"name": "basic",
-								"label": "Basic",
-								"elements":[
-									{
-										"name": "Name",
-										"label": "Name",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "Type",
-										"label": "Resource Group",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {}
-									}
-								]
-							}
-						],
-						"outputs": {
-							"Name": "[steps('basic').Name]",
-							"ResourceGroup": "[steps('basic').Type]"
-						}
-					}
-				},
-				"commands": [],
-				"columns": [
-					{
-						"key": "name",
-						"displayName": "Name"
-					},
-					{
-						"key": "location",
-						"displayName": "Location"
-					},
-					{
-						"key": "properties.provisioningState",
-						"displayName": "Status"
-					}
-				]
-			}
-		},
-		{
-			"kind": "CustomResources",
-			"properties": {
-				"displayName": "Meta Data",
-				"version": "1.0.0.0",
-				"resourceType": "PlanConfigs",
-				"createUIDefinition": {
-					"handler": "Microsoft.Azure.CreateUIDef",
-					"parameters":
-					{
-						"config": {
-							"isWizard": true
+						{
+							"key": "properties.ImageId",
+							"displayName": "Image Id"
 						},
-						"basics": [],
-						"steps": [
-							{
-								"name": "basic",
-								"label": "Basic",
-								"elements":[
-									{
-										"name": "Name",
-										"label": "Name",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "Value",
-										"label": "Value",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									}
-								]
-							}
-						],
-						"outputs": {
-							"Key": "[steps('basic').Name]",
-							"Value": "[steps('basic').Value]"
+						{
+							"key": "properties.OS",
+							"displayName": "OS"
 						}
-					}
-				},
-				"commands": [
-				],
-				"columns": [
-					{
-						"key": "properties.Key",
-						"displayName": "Name"
-					},
-					{
-						"key": "properties.Value",
-						"displayName": "Value"
-					}
-				]
-			}
-		},
-		{
-			"kind": "CustomResources",
-			"properties": {
-				"displayName": "Images",
-				"version": "1.0.0.0",
-				"resourceType": "Images",
-				"createUIDefinition": {
-					"handler": "Microsoft.Azure.CreateUIDef",
-					"parameters":
-					{
-						"config": {
-							"isWizard": true
+					]
+				}
+			},
+			{
+				"kind": "CustomResources",
+				"properties": {
+					"displayName": "Tenant",
+					"version": "1.0.0.0",
+					"resourceType": "Tenant",
+					"commands": [
+					],
+					"columns": [
+						{
+							"key": "properties.AccountName",
+							"displayName": "AccountName"
 						},
-						"basics": [],
-						"steps": [
-							{
-								"name": "basic",
-								"label": "Basic",
-								"elements":[
-									{
-										"name": "Name",
-										"label": "Name",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "ImageId",
-										"label": "Image Id",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "OS",
-										"label": "OS",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": ""
-									},
-									{
-										"name": "Base64UserData",
-										"label": "User Data",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": ""
-									}
-								]
-							}
-						],
-						"outputs": {
-							"Name": "[steps('basic').Name]",
-							"ImageId": "[steps('basic').ImageId]",
-							"OS": "[steps('basic').OS]",
-							"Base64UserData": "[steps('basic').Base64UserData]"
+						{
+							"key": "properties.TenantId",
+							"displayName": "TenantId"
 						}
-					}
-				},
-				"commands": [
-				],
-				"columns": [
-					{
-						"key": "properties.Name",
-						"displayName": "Name"
-					},
-					{
-						"key": "properties.ImageId",
-						"displayName": "Image Id"
-					},
-					{
-						"key": "properties.OS",
-						"displayName": "OS"
-					}
-				]
+					]
+				}
 			}
-		},
-		{
-			"kind": "CustomResources",
-			"properties": {
-				"displayName": "Tenant",
-				"version": "1.0.0.0",
-				"resourceType": "Tenant",
-				"commands": [
-				],
-				"columns": [
-					{
-						"key": "properties.AccountName",
-						"displayName": "AccountName"
-					},
-					{
-						"key": "properties.TenantId",
-						"displayName": "TenantId"
-					}
-				]
-			}
-		}
-	]
-}
+		]
+	}
