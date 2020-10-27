@@ -1,0 +1,18 @@
+{
+	"views": [
+		{
+			"kind": "Overview",
+			"properties": {
+				"header": "Welcome to your Demo Azure Managed Application",
+				"description": "This Managed application with Custom Provider is for demo purposes only.",
+				"commands": [
+					{
+						"displayName": "Ping Action",
+						"path": "/customping",
+						"icon": "LaunchCurrent"
+					}
+				]
+			}
+		}
+	]
+}

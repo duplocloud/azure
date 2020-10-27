@@ -25,18 +25,21 @@
     },
     "Subnets": {
 		"type": "array",
+		"defaultValue": [],
         "metadata": {
             "description": "Subnets config."
         }
 	},
 	"loganalyticsws": {
 		"type": "bool",
+		"defaultValue": false,
 		"metadata": {
             "description": "Property to enable LogAnalyticsConfig."
         }
 	},
 	"vaultconfig": {
 		"type": "bool",
+		"defaultValue": false,
 		"metadata": {
             "description": "Property to enable Recovery services vault config."
         }
