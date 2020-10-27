@@ -9,6 +9,10 @@
 				"description": "Name of the VM"
 			}
 		},
+		"Cloud":{
+			"type": "int",
+			"defaultValue": 2
+		},
 		"Capacity": {
 			"type": "string",
 			"defaultValue": "Standard_D2s_v3",
@@ -41,6 +45,30 @@
 				"description": "Root Disk size in GB"
 			}
 		},
+		"EncryptDisk": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {}
+		},
+		"AllocatedPublicIp": {
+			"type": "bool",
+			"defaultValue": false,
+			"metadata": {}
+		},
+		"MetaDataEx": {
+			"type": "object",
+			"defaultValue": {},
+			"metadata": {}
+		},
+		"Volumes": {
+			"type": "array",
+			"defaultValue": [],
+			"metadata": {}
+		},
+		"Base64UserData": {
+			"type": "string",
+			"defaultValue": ""
+		},
 		"JoinDomain": {
 			"type": "string",
 			"defaultValue": "false",
@@ -64,12 +92,12 @@
 			}
 		},
 		"UpdatePolicyStartTime": {
-			"type":"string",
-            "defaultValue": "[utcNow('u')]"
+			"type": "string",
+			"defaultValue": "[utcNow('u')]"
 		},
 		"UpdatePolicyTimezone": {
-			"type":"string",
-            "defaultValue": "America/Los_Angeles"
+			"type": "string",
+			"defaultValue": "America/Los_Angeles"
 		},
 		"BackupPolicyId": {
 			"type": "string",
@@ -87,11 +115,11 @@
 				"Capacity": "[parameters('Capacity')]",
 				"ImageId": "[parameters('ImageId')]",
 				"Cloud": 2,
-				"MetaDataEx": {
-					"OsDiskSize": "[parameters('OsDiskSize')]",
-					"JoinDomain": "[parameters('JoinDomain')]",
-					"joinLogAnalyticsWs": "[parameters('joinLogAnalyticsWs')]"
-				}
+				"EncryptDisk": "[parameters('EncryptDisk')]",
+				"MetaDataEx": "[parameters('MetaDataEx')]",
+				"AllocatedPublicIp": "[parameters('AllocatedPublicIp')]",
+				"Volumes": "[parameters('Volumes')]",
+				"Base64UserData": "[parameters('Base64UserData')]",
 			}
 		},
 		{
