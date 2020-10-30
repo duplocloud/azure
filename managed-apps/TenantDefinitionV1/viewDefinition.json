@@ -182,11 +182,11 @@
 												"allowedValues": [
 													{
 														"label": "Yes",
-														"value": true
+														"value": "true"
 													},
 													{
 														"label": "No",
-														"value": false
+														"value": "false"
 													}
 												],
 												"required": true
@@ -201,11 +201,11 @@
 												"allowedValues": [
 													{
 														"label": "Yes",
-														"value": true
+														"value": "true"
 													},
 													{
 														"label": "No",
-														"value": false
+														"value": "false"
 													}
 												],
 												"required": true
@@ -296,6 +296,19 @@
 															}
 														},
 														"columns": [
+															{
+																"id": "Name",
+																"header": "Name",
+																"width": "1fr",
+																"element": {
+																	"name": "name",
+																	"type": "Microsoft.Common.TextBox",
+																	"placeholder": "disk1",
+																	"constraints": {
+																		"required": true
+																	}
+																}
+															},
 															{
 																"id": "VolumeId",
 																"header": "Volume ID",
@@ -403,7 +416,7 @@
 											"name": "rebootSetting",
 											"label": "Reboot settings",
 											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "RebootOnly",
+											"defaultValue": "IfRequired",
 											"constraints": {
 												"allowedValues": [
 													{
@@ -436,7 +449,7 @@
 											"name": "startTime",
 											"label": "Update on",
 											"type": "Microsoft.Common.TextBox",
-											"defaultValue": "2020-10-28T19:00:00",
+											"defaultValue": "2021-01-01T12:00:00",
 											"toolTip": "Format of timestamp 2020-10-28T19:00:00",
 											"constraints": {
 												"required": true
@@ -460,19 +473,24 @@
 								}
 							],
 							"outputs": {
-								"FriendlyName": "[steps('basic').name]",
-								"Capacity": "[steps('basic').type]",
-								"EncryptDisk": "[steps('advanced').encryption]",
-								"ImageId": "[steps('basic').imageid]",
-								"Base64UserData": "[steps('advanced').userdata]",
-								"AllocatedPublicIp": "[steps('networking').publicip]",
-								"Cloud": 2,
-								"MetaDataEx": {
-									"OsDiskSize": "[steps('advanced').disksize]",
-									"JoinDomain": "[steps('networking').joinDomain]",
-									"JoinLogAnalytics": "[steps('networking').joinLogAnalyticsWs]"
-								},
-								"Volumes": "[steps('advanced').volumes.tags]"
+								"ArmTemplateDeployment": "true",
+								"properties": {
+									"FriendlyName": {"value": "[steps('basic').name]"},
+									"Capacity": {"value": "[steps('basic').type]"},
+									"ImageId": {"value": "[steps('basic').imageid]"},
+									"OsDiskSize": {"value": "[steps('advanced').disksize]"},
+									"JoinDomain": {"value": "[steps('networking').joinDomain]"},
+									"joinLogAnalyticsWs": {"value": "[steps('networking').joinLogAnalyticsWs]"},
+									"Volumes": {"value": "[steps('advanced').volumes.tags]"},
+									"AllocatedPublicIp": {"value": "[steps('networking').publicip]"},
+									"EncryptDisk": {"value": "[steps('advanced').encryption]"},
+									"UpdateClassifications": {"value": "[steps('patching').UpdateClassifications]"},
+									"rebootSetting": {"value": "[steps('patching').rebootSetting]"},
+									"frequency": {"value": "[steps('patching').frequency]"},
+									"startTime": {"value": "[steps('patching').startTime]"},
+									"timeZone": {"value": "[steps('patching').timeZone]"},
+									"BackupPolicyName": {"value": "[steps('backup').backupPolicy]"}
+								}
 							}
 						}
 					},

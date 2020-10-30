@@ -1,0 +1,210 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "FriendlyName": {
+      "type": "string",
+      "defaultValue": "host1-sdfs",
+      "metadata": {
+        "description": "Name of the VM"
+      }
+    },
+    "Capacity": {
+      "type": "string",
+      "defaultValue": "Standard_D2s_v3",
+      "metadata": {
+        "description": "VM Capacity"
+      }
+    },
+    "ImageId": {
+      "type": "string",
+      "defaultValue": "16.04-LTS;Canonical;UbuntuServer",
+      "metadata": {
+        "description": "The location for the resources."
+      }
+    },
+    "OsDiskSize": {
+      "type": "string",
+      "defaultValue": "127",
+      "metadata": {
+        "description": "Root Disk size in GB"
+      }
+    },
+    "JoinDomain": {
+      "type": "string",
+      "defaultValue": "false",
+      "allowedValues": [
+        "true",
+        "false"
+      ],
+      "metadata": {
+        "description": "Join Domain"
+      }
+    },
+    "joinLogAnalyticsWs": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ],
+      "metadata": {
+        "description": "Join Log Analytics Workspace"
+      }
+    },
+    "Volumes": {
+      "type": "array",
+      "metadata": {
+        "description": "Extra data disks config"
+      }
+    },
+    "AllocatedPublicIp": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "AllocatedPublicIp"
+      }
+    },
+    "EncryptDisk": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "EncryptDisk"
+      }
+    },
+    "UpdateClassifications": {
+      "type": "string",
+      "defaultValue": "Critical",
+      "metadata": {
+        "description": "UpdateClassifications"
+      }
+    },
+    "rebootSetting": {
+      "type": "string",
+      "defaultValue": "IfRequired",
+      "metadata": {
+        "description": "rebootSetting"
+      }
+    },
+    "frequency": {
+      "type": "string",
+      "defaultValue": "OneTime",
+      "metadata": {
+        "description": "frequency"
+      }
+    },
+    "startTime": {
+      "type": "string",
+      "defaultValue": "2021-01-01T12:00:00",
+      "metadata": {
+        "description": "startTime"
+      }
+    },
+    "timeZone": {
+      "type": "string",
+      "defaultValue": "America/Los_Angeles",
+      "metadata": {
+        "description": "timeZone"
+      }
+    },
+    "BackupPolicyName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "BackupPolicyName"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.CustomProviders/resourceProviders/VirtualMachines",
+      "name": "[concat('public/', parameters('FriendlyName'))]",
+      "apiVersion": "2018-09-01-preview",
+      "location": "EAST US",
+      "properties": {
+        "FriendlyName": "[parameters('FriendlyName')]",
+        "Capacity": "[parameters('Capacity')]",
+        "ImageId": "[parameters('ImageId')]",
+        "AllocatedPublicIp": "[parameters('AllocatedPublicIp')]",
+        "EncryptDisk": "[parameters('EncryptDisk')]",
+        "Cloud": 2,
+        "MetaDataEx": {
+          "OsDiskSize": "[parameters('OsDiskSize')]",
+          "JoinDomain": "[parameters('JoinDomain')]",
+          "joinLogAnalyticsWs": "[parameters('joinLogAnalyticsWs')]"
+        },
+        "Volumes": "[parameters('Volumes')]"
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deploymentScripts",
+      "apiVersion": "2019-10-01-preview",
+      "name": "[concat('waitScript', parameters('FriendlyName'))]",
+      "location": "eastus",
+      "kind": "AzureCLI",
+      "identity": {
+        "type": "userAssigned",
+        "userAssignedIdentities": {
+          "/subscriptions/29474c73-cd93-48f0-80ee-9577a54e2227/resourceGroups/duploinfra-demo/providers/Microsoft.ManagedIdentity/userAssignedIdentities/azure-deployment-scripts": {}
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.CustomProviders/resourceProviders/VirtualMachines', 'public' , parameters('FriendlyName'))]"
+      ],
+      "properties": {
+        "forceUpdateTag": 1,
+        "AzCliVersion": "2.0.80",
+        "environmentVariables": [],
+        "arguments": "'azdemo1','log-aqlg5r'",
+        "scriptContent": "#!/bin/bash\nsleep 2400",
+        "supportingScriptUris": [],
+        "timeout": "PT50M",
+        "cleanupPreference": "OnSuccess",
+        "retentionInterval": "P1D"
+      }
+    },
+    {
+      "type": "Microsoft.CustomProviders/resourceProviders/UpdatePolicies",
+      "name": "[concat('public/', parameters('FriendlyName'))]",
+      "apiVersion": "2018-09-01-preview",
+      "location": "EAST US",
+      "dependsOn": [
+        "[concat('waitScript', parameters('FriendlyName'))]"
+      ],
+      "properties": {
+        "VmName": "[concat('duploservices-a002-ctscan-', parameters('FriendlyName'))]",
+        "properties": {
+          "updateConfiguration": {
+            "linux": {
+              "includedPackageClassifications": "[parameters('UpdateClassifications')]",
+              "rebootSetting": "[parameters('rebootSetting')]"
+            },
+            "windows": {
+              "includedUpdateClassifications": "[parameters('UpdateClassifications')]",
+              "rebootSetting": "[parameters('rebootSetting')]"
+            }
+          },
+          "scheduleInfo": {
+            "frequency": "[parameters('frequency')]",
+            "startTime": "[parameters('startTime')]",
+            "timeZone": "[parameters('timeZone')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.CustomProviders/resourceProviders/ProtectedVM",
+      "name": "[concat('public/', parameters('FriendlyName'))]",
+      "apiVersion": "2018-09-01-preview",
+      "location": "EAST US",
+      "dependsOn": [
+        "[concat('waitScript', parameters('FriendlyName'))]"
+      ],
+      "properties": {
+        "VmName": "[concat('duploservices-a002-ctscan-', parameters('FriendlyName'))]",
+        "PolicyName": "[parameters('BackupPolicyName')]"
+      }
+    }
+  ],
+  "outputs": {}
+}
