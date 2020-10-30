@@ -1,1132 +1,834 @@
-	{
-		"views": [
-			{
-				"kind": "Overview",
-				"properties": {
-					"header": "Welcome to your Demo Azure Managed Application",
-					"description": "This Managed application with Custom Provider is for demo purposes only.",
-					"commands": [
-						{
-							"displayName": "Ping Action",
-							"path": "/customping",
-							"icon": "LaunchCurrent"
-						}
-					]
-				}
-			},
-			{
-				"kind": "CustomResources",
-				"properties": {
-					"displayName": "VirtualMachines",
-					"version": "1.0.0.0",
-					"resourceType": "VirtualMachines",
-					"createUIDefinition": {
-						"handler": "Microsoft.Azure.CreateUIDef",
-						"parameters": {
-							"config": {
-								"isWizard": false
-							},
-							"basics": [],
-							"steps": [
-								{
-									"name": "basic",
-									"label": "Basic",
-									"elements": [
-										{
-											"name": "subscriptionsApi",
-											"type": "Microsoft.Solutions.ArmApiControl",
-											"request": {
-												"method": "GET",
-												"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
-											}
-										},
-										{
-											"name": "subscriptionDropDown",
-											"type": "Microsoft.Common.DropDown",
-											"label": "Subscriptions",
-											"toolTip": "",
-											"constraints": {
-												"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
-												"required": true
-											},
-											"visible": true
-										},
-										{
-											"name": "resourceGroupsApi",
-											"type": "Microsoft.Solutions.ArmApiControl",
-											"request": {
-												"method": "GET",
-												"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
-											}
-										},
-										{
-											"name": "resourceGroupDropDown",
-											"type": "Microsoft.Common.DropDown",
-											"label": "Resource Groups",
-											"toolTip": "",
-											"constraints": {
-												"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duplomgapp-mgr-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duplomgapp-mgr-', ''), '\",\"value\":\"', item.name, '\"}')))]",
-												"required": true
-											},
-											"visible": true
-										},
-										{
-											"name": "name",
-											"label": "Name",
-											"type": "Microsoft.Common.TextBox",
-											"defaultValue": "",
-											"toolTip": "Choose a name for the VM",
-											"constraints": {
-												"required": true
-											}
-										},
-										{
-											"name": "type",
-											"type": "Microsoft.Common.DropDown",
-											"label": "Instance Type",
-											"placeholder": "",
-											"defaultValue": "Standard_DS2_v2",
-											"toolTip": "Choose a size",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "B1ls (1 CPU, 0.5 GB RAM)",
-														"value": "Standard_B1ls"
-													},
-													{
-														"label": "DS1_v2 (1 CPU, 3.5 GB RAM)",
-														"value": "Standard_DS1_v2"
-													},
-													{
-														"label": "D2s_v3 (2 CPU, 8 GB RAM)",
-														"value": "Standard_D2s_v3"
-													},
-													{
-														"label": "B2s (2 CPU, 4 GB RAM)",
-														"value": "Standard_B2s"
-													},
-													{
-														"label": "DS2_v2 (2 CPU, 7 GB RAM)",
-														"value": "Standard_DS2_v2"
-													},
-													{
-														"label": "DS3_v2 (4 CPU, 14 GB RAM)",
-														"value": "Standard_DS3_v2"
-													},
-													{
-														"label": "D4s_v3 (4 CPU, 16 GB RAM)",
-														"value": "Standard_D4s_v3"
-													},
-													{
-														"label": "B4ms (4 CPU, 16 GB RAM)",
-														"value": "Standard_B4ms"
-													}
-												],
-												"required": true
-											},
-											"visible": true
-										},
-										{
-											"name": "imageid",
-											"type": "Microsoft.Common.DropDown",
-											"label": "Image ID",
-											"placeholder": "",
-											"defaultValue": "16.04-LTS;Canonical;UbuntuServer",
-											"toolTip": "",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "Ubuntu 16",
-														"value": "16.04-LTS;Canonical;UbuntuServer"
-													},
-													{
-														"label": "Server2016",
-														"value": "2016-Datacenter;MicrosoftWindowsServer;WindowsServer"
-													}
-												],
-												"required": true
-											},
-											"visible": true
-										}
-									]
-								},
-								{
-									"name": "networking",
-									"label": "Networking",
-									"elements": [
-										{
-											"name": "publicip",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": false,
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "Yes",
-														"value": true
-													},
-													{
-														"label": "No",
-														"value": false
-													}
-												],
-												"required": true
-											},
-											"label": "Public IP"
-										},
-										{
-											"name": "joinDomain",
-											"label": "Join Domain",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": false,
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "Yes",
-														"value": true
-													},
-													{
-														"label": "No",
-														"value": false
-													}
-												],
-												"required": true
-											}
-										},
-										{
-											"name": "joinLogAnalyticsWs",
-											"label": "Join LogAnalytic Workspace",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": false,
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "Yes",
-														"value": true
-													},
-													{
-														"label": "No",
-														"value": false
-													}
-												],
-												"required": true
-											}
-										},
-										{
-											"name": "subnetsApi",
-											"type": "Microsoft.Solutions.ArmApiControl",
-											"request": {
-												"method": "POST",
-												"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
-												"body": {
-													"BackendUrl": "GetAzureTenantSubnets",
-													"Method": "GET"
-												}
-											}	
-										},
-										{
-											"name": "subnets",
-											"type": "Microsoft.Common.DropDown",
-											"label": "Subnets",
-											"toolTip": "Choose one of the Subnets",
-											"constraints": {
-												"allowedValues": "[map(steps('networking').subnetsApi.value, (item) => parse(concat('{\"label\":\"', item.NameEx, '\",\"value\":\"', item.NameEx, '\"}')))]",
-												"required": true
-											},
-											"visible": true
-										}
-									]
-								},
-								{
-									"name": "advanced",
-									"label": "Volumes",
-									"elements": [
-										{
-											"name": "encryption",
-											"label": "Encrypt",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": false,
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "Yes",
-														"value": true
-													},
-													{
-														"label": "No",
-														"value": false
-													}
-												],
-												"required": true
-											}
-										},
-										{
-											"name": "disksize",
-											"label": "Size",
-											"type": "Microsoft.Common.TextBox",
-											"defaultValue": "30",
-											"toolTip": "Provide the Disk Size",
-											"constraints": {
-												"required": true
-											}
-										},
-										{
-											"name": "userdata",
-											"label": "User Data",
-											"type": "Microsoft.Common.TextBox",
-											"defaultValue": "",
-											"toolTip": "User data",
-											"constraints": {}
-										},
-										{
-											"name": "volumes",
-											"type": "Microsoft.Common.Section",
-											"label": "Volumes",
-											"elements": [
-												{
-													"name": "tags",
-													"type": "Microsoft.Common.EditableGrid",
-													"ariaLabel": "Enter information about disks",
-													"label": "Tags",
-													"constraints": {
-														"width": "Full",
-														"rows": {
-															"count": {
-																"min": 0,
-																"max": 10
-															}
-														},
-														"columns": [
-															{
-																"id": "VolumeId",
-																"header": "Volume ID",
-																"width": "1fr",
-																"element": {
-																	"name": "dropDown1",
-																	"type": "Microsoft.Common.TextBox",
-																	"placeholder": "1",
-																	"constraints": {
-																		"required": true
-																	}
-																}
-															},
-															{
-																"id": "Size",
-																"header": "Size",
-																"width": "1fr",
-																"element": {
-																	"type": "Microsoft.Common.TextBox",
-																	"placeholder": "100",
-																	"constraints": {
-																		"required": true
-																	}
-																}
-															},
-															{
-																"id": "VolumeType",
-																"header": "Snapshot ID",
-																"width": "1fr",
-																"element": {
-																	"type": "Microsoft.Common.TextBox",
-																	"placeholder": "Name",
-																	"constraints": {
-																		"validations": [
-																		]
-																	}
-																}
-															}
-														]
-													}
-												}
-											]
-										}
-									]
-								},
-								{
-									"name": "backup",
-									"label": "Backup policy",
-									"elements": [
-										{
-											"name": "backupPoliciesApi",
-											"type": "Microsoft.Solutions.ArmApiControl",
-											"request": {
-												"method": "POST",
-												"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",											"body": {
-													"BackendUrl": "GetAzureVaultBackupPoliciesByTenant",
-													"Method": "GET"
-												}
-											}	
-										},
-										{
-											"name": "backupPolicy",
-											"type": "Microsoft.Common.DropDown",
-											"label": "Backup Policy",
-											"toolTip": "Choose a backup policy",
-											"constraints": {
-												"allowedValues": "[map(steps('backup').backupPoliciesApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
-												"required": true
-											},
-											"visible": true
-										}
-									]
-								},
-								{
-									"name": "patching",
-									"label": "Patching policy",
-									"elements": [
-										{
-											"name": "UpdateClassifications",
-											"label": "Update Classifications",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "Critical",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "Critical",
-														"value": "Critical"
-													},
-													{
-														"label": "Security",
-														"value": "Security"
-													},
-													{
-														"label": "Other",
-														"value": "Other"
-													},
-													{
-														"label": "Unclassified",
-														"value": "Unclassified"
-													}
-												]
-											}
-										},
-										{
-											"name": "rebootSetting",
-											"label": "Reboot settings",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "RebootOnly",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "RebootOnly",
-														"value": "RebootOnly"
-													},
-													{
-														"label": "IfRequired",
-														"value": "IfRequired"
-													}
-
-												]
-											}
-										},
-										{
-											"name": "frequency",
-											"label": "Frequency",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "OneTime",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "OneTime",
-														"value": "OneTime"
-													}
-												]
-											}
-										},
-										{
-											"name": "startTime",
-											"label": "Update on",
-											"type": "Microsoft.Common.TextBox",
-											"defaultValue": "2020-10-28T19:00:00",
-											"toolTip": "Format of timestamp 2020-10-28T19:00:00",
-											"constraints": {
-												"required": true
-											}
-										},
-										{
-											"name": "timeZone",
-											"label": "TimeZone",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "America/Los_Angeles",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "America/Los_Angeles",
-														"value": "America/Los_Angeles"
-													}
-												]
-											}
-										}
-									]
-								}
-							],
-							"outputs": {
-								"FriendlyName": "[steps('basic').name]",
-								"Capacity": "[steps('basic').type]",
-								"EncryptDisk": "[steps('advanced').encryption]",
-								"ImageId": "[steps('basic').imageid]",
-								"Base64UserData": "[steps('advanced').userdata]",
-								"AllocatedPublicIp": "[steps('networking').publicip]",
-								"Cloud": 2,
-								"MetaDataEx": {
-									"OsDiskSize": "[steps('advanced').disksize]",
-									"JoinDomain": "[steps('networking').joinDomain]",
-									"JoinLogAnalytics": "[steps('networking').joinLogAnalyticsWs]"
-								},
-								"Volumes": "[steps('advanced').volumes.tags]"
-							}
-						}
-					},
-					"editUIDefinition": {
-						"$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
-						"handler": "Microsoft.Azure.CreateUIDef",
-						"version": "0.1.2-preview",
-						"parameters": {
-							"basics": [
-								{}
-							],
-							"steps": [
-								{
-									"name": "basic",
-									"label": "Basic",
-									"elements": [
-										{
-											"name": "updateComponentDropDown",
-											"type": "Microsoft.Common.DropDown",
-											"label": "Component to Update",
-											"placeholder": "",
-											"toolTip": "Choose a Component to Update",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "Patch Window",
-														"value": "UpdatePolicies"
-													}
-												],
-												"required": true
-											},
-											"visible": true
-							  			},
-										{
-											"name": "VmName",
-											"label": "Vm Name",
-											"type": "Microsoft.Common.TextBox",
-											"defaultValuePath": "properties.FriendlyName",
-											"constraints": {}
-										},
-										{
-											"name": "osType",
-											"label": "OS Type",
-											"type": "Microsoft.Common.TextBox",
-											"defaultValuePath": "properties.OsPlatform",
-											"visible": true,
-											"toolTip": "Format of timestamp 2020-10-28T19:00:00"
-										},
-										{
-											"name": "UpdateClassifications",
-											"label": "Linux Update Classifications",
-											"type": "Microsoft.Common.DropDown",
-											"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdatePolicies'), empty(steps('basic').osType))]",
-											"defaultValue": "Critical",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "Critical",
-														"value": "Critical"
-													},
-													{
-														"label": "Security",
-														"value": "Security"
-													},
-													{
-														"label": "Other",
-														"value": "Other"
-													},
-													{
-														"label": "Unclassified",
-														"value": "Unclassified"
-													}
-												]
-											}
-										},
-										{
-											"name": "WindowsUpdateClassifications",
-											"label": "Windows Update Classifications",
-											"type": "Microsoft.Common.DropDown",
-											"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdatePolicies'), equals(steps('basic').osType, 'Windows'))]",
-											"defaultValue": "Critical",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "Critical",
-														"value": "Critical"
-													},
-													{
-														"label": "Security",
-														"value": "Security"
-													},
-													{
-														"label": "UpdateRollup",
-														"value": "UpdateRollup"
-													},
-													{
-														"label": "FeaturePack",
-														"value": "FeaturePack"
-													},
-													{
-														"label": "ServicePack",
-														"value": "ServicePack"
-													},
-													{
-														"label": "Definition",
-														"value": "Definition"
-													},
-													{
-														"label": "Tools",
-														"value": "Tools"
-													},
-													{
-														"label": "Updates",
-														"value": "Updates"
-													}
-												]
-											}
-										},
-										{
-											"name": "rebootSetting",
-											"label": "Reboot settings",
-											"type": "Microsoft.Common.DropDown",
-											"visible": "[equals(steps('basic').updateComponentDropDown, 'UpdatePolicies')]",
-											"defaultValue": "IfRequired",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "RebootOnly",
-														"value": "RebootOnly"
-													},
-													{
-														"label": "IfRequired",
-														"value": "IfRequired"
-													}
-
-												]
-											}
-										},
-										{
-											"name": "frequency",
-											"label": "Frequency",
-											"visible": "[equals(steps('basic').updateComponentDropDown, 'UpdatePolicies')]",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "OneTime",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "OneTime",
-														"value": "OneTime"
-													}
-												]
-											}
-										},
-										{
-											"name": "startTime",
-											"label": "Update on",
-											"visible": "[equals(steps('basic').updateComponentDropDown, 'UpdatePolicies')]",
-											"type": "Microsoft.Common.TextBox",
-											"defaultValue": "2020-10-28T19:00:00",
-											"toolTip": "Format of timestamp 2020-10-28T19:00:00",
-											"constraints": {
-												"required": true
-											}
-										},
-										{
-											"name": "timeZone",
-											"label": "TimeZone",
-											"visible": "[equals(steps('basic').updateComponentDropDown, 'UpdatePolicies')]",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "America/Los_Angeles",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "America/Los_Angeles",
-														"value": "America/Los_Angeles"
-													}
-												]
-											}
-										}
-									]
-								}
-							],
-							"outputs": {
-								"updateType": "[steps('basic').updateComponentDropDown]",
-								"VmName": "[steps('basic').VmName]",
-								"properties": {
-									"updateConfiguration": {
-										"linux": {
-											"includedPackageClassifications": "[steps('basic').UpdateClassifications]",
-											"rebootSetting": "[steps('basic').rebootSetting]"
-										},
-										"windows": {
-											"includedUpdateClassifications": "[steps('basic').WindowsUpdateClassifications]",
-											"rebootSetting": "[steps('basic').rebootSetting]"
-										}
-									},
-									"scheduleInfo": {
-										"frequency": "[steps('basic').frequency]",
-										"startTime": "[concat(steps('basic').startTime, '+00:00')]",
-										"timeZone": "[steps('basic').timeZone]"
-									}
-								}
-							}
-						}
-					},
-					"commands": [
-						{
-							"displayName": "Start",
-							"path": "VirtualMachines/startAzureHost",
-							"icon": "Start"
-						},
-						{
-							"displayName": "Stop",
-							"path": "VirtualMachines/stopAzureHost",
-							"icon": "Stop"
-						},
-						{
-							"displayName": "Backup Policy",
-							"path": "VirtualMachines/ProxyPost",
-							"icon": "Link",
-							"createUIDefinition": {
-								"$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
-								"handler": "Microsoft.Azure.CreateUIDef",
-								"version": "0.1.2-preview",
-								"parameters": {
-									"basics": [
-										{}
-									],
-									"steps": [
-										{
-											"name": "storageConfig",
-											"label": "Storage settings",
-											"elements": [
-												{
-													"name": "LgWsName",
-													"label": "Workspace Name",
-													"type": "Microsoft.Common.TextBox",
-													"defaultValuePath": "properties.FriendlyName",
-													"constraints": {}
-												}
-											]
-										}
-									],
-									"outputs": {
-										"storageAccountNamePrefix": "[steps('storageConfig').storageAccounts.prefix]",
-										"storageAccountType": "[steps('storageConfig').storageAccounts.type]",
-										"location": "[location()]",
-										"tagsByResource": "[steps('tags').tagsByResource]"
-									}
-								}
-							}
-						}
-					],
-					"columns": [
-						{
-							"key": "properties.FriendlyName",
-							"displayName": "Full Name"
-						},
-						{
-							"key": "properties.Status",
-							"displayName": "Status"
-						},
-						{
-							"key": "properties.PrivateIpAddress",
-							"displayName": "Priavte IP",
-							"optional": true
-						}
-					]
-				}
-			},
-
-			{
-				"kind": "CustomResources",
-				"properties": {
-					"displayName": "Patching Window",
-					"version": "1.0.0.0",
-					"resourceType": "UpdatePolicies",
-					"createUIDefinition": {
-						"handler": "Microsoft.Azure.CreateUIDef",
-						"parameters": {
-							"config": {
-								"isWizard": true
-							},
-							"basics": [],
-							"steps": [
-								{
-									"name": "basic",
-									"label": "Basic",
-									"elements": [
-										{
-											"name": "subscriptionsApi",
-											"type": "Microsoft.Solutions.ArmApiControl",
-											"request": {
-												"method": "GET",
-												"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
-											}
-										},
-										{
-											"name": "subscriptionDropDown",
-											"type": "Microsoft.Common.DropDown",
-											"label": "Subscriptions",
-											"toolTip": "",
-											"constraints": {
-												"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
-												"required": true
-											},
-											"visible": true
-										},
-										{
-											"name": "resourceGroupsApi",
-											"type": "Microsoft.Solutions.ArmApiControl",
-											"request": {
-												"method": "GET",
-												"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
-											}
-										},
-										{
-											"name": "resourceGroupDropDown",
-											"type": "Microsoft.Common.DropDown",
-											"label": "Resource Groups",
-											"toolTip": "",
-											"constraints": {
-												"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duplomgapp-mgr-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duplomgapp-mgr-', ''), '\",\"value\":\"', item.name, '\"}')))]",
-												"required": true
-											},
-											"visible": true
-										},
-										{
-											"name": "vmListApi",
-											"type": "Microsoft.Solutions.ArmApiControl",
-											"request": {
-												"method": "POST",
-												"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
-												"body": {
-													"BackendUrl": "GetAsyncNativeHosts",
-													"Method": "GET"
-												}
-											}	
-										},
-										{
-											"name": "VmName",
-											"type": "Microsoft.Common.DropDown",
-											"label": "Virtual Machine",
-											"toolTip": "Choose one of the Virtual Machine",
-											"constraints": {
-												"allowedValues": "[map(steps('basic').vmListApi.value, (item) => parse(concat('{\"label\":\"', item.FriendlyName, '\",\"value\":\"', item.FriendlyName, '\"}')))]",
-												"required": true
-											},
-											"visible": true
-										},
-										{
-											"name": "osType",
-											"label": "OS Type",
-											"type": "Microsoft.Common.TextBox",
-											"defaultValue": "[if(empty(steps('basic').vmListApi.value), steps('basic').VmName, steps('basic').VmName)]",
-											"toolTip": "Format of timestamp 2020-10-28T19:00:00"
-										},
-										{
-											"name": "UpdateClassifications",
-											"label": "Update Classifications",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "Critical",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "Critical",
-														"value": "Critical"
-													},
-													{
-														"label": "Security",
-														"value": "Security"
-													},
-													{
-														"label": "Other",
-														"value": "Other"
-													},
-													{
-														"label": "Unclassified",
-														"value": "Unclassified"
-													}
-												]
-											}
-										},
-										{
-											"name": "WindowsUpdateClassifications",
-											"label": "Windows Update Classifications",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "Critical",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "Critical",
-														"value": "Critical"
-													},
-													{
-														"label": "Security",
-														"value": "Security"
-													},
-													{
-														"label": "Other",
-														"value": "Other"
-													},
-													{
-														"label": "Unclassified",
-														"value": "Unclassified"
-													}
-												]
-											}
-										},
-										{
-											"name": "rebootSetting",
-											"label": "Reboot settings",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "RebootOnly",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "RebootOnly",
-														"value": "RebootOnly"
-													},
-													{
-														"label": "IfRequired",
-														"value": "IfRequired"
-													}
-
-												]
-											}
-										},
-										{
-											"name": "frequency",
-											"label": "Frequency",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "OneTime",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "OneTime",
-														"value": "OneTime"
-													}
-												]
-											}
-										},
-										{
-											"name": "startTime",
-											"label": "Update on",
-											"type": "Microsoft.Common.TextBox",
-											"defaultValue": "2020-10-28T19:00:00",
-											"toolTip": "Format of timestamp 2020-10-28T19:00:00",
-											"constraints": {
-												"required": true
-											}
-										},
-										{
-											"name": "timeZone",
-											"label": "TimeZone",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "America/Los_Angeles",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "America/Los_Angeles",
-														"value": "America/Los_Angeles"
-													}
-												]
-											}
-										}
-									]
-								}
-							],
-							"outputs": {
-								"VmName": "[steps('basic').VmName]",
-								"properties": {
-									"updateConfiguration": {
-										"linux": {
-											"includedUpdateClassifications": "[steps('basic').UpdateClassifications]",
-											"rebootSetting": "[steps('basic').rebootSetting]"
-										}
-									},
-									"scheduleInfo": {
-										"frequency": "[steps('basic').frequency]",
-										"startTime": "[concat(steps('basic').startTime, '+00:00')]",
-										"timeZone": "[steps('basic').timeZone]"
-									}
-								}
-							}
-						}
-					},
-					"commands": [
-					],
-					"columns": [
-						{
-							"key": "name",
-							"displayName": "Name"
-						},
-						{
-							"key": "properties_frequency",
-							"displayName": "Frequency"
-						},
-						{
-							"key": "properties_nextRun",
-							"displayName": "Next Run"
-						},
-						{
-							"key": "properties_updateConfiguration.duration",
-							"displayName": "Duration"
-						}
-					]
-				}
-			},
-			{
-				"kind": "CustomResources",
-				"properties": {
-					"displayName": "Protected VMs",
-					"version": "1.0.0.0",
-					"resourceType": "ProtectedVM",
-					"createUIDefinition": {
-						"handler": "Microsoft.Azure.CreateUIDef",
-						"parameters": {
-							"config": {
-								"isWizard": true
-							},
-							"basics": [],
-							"steps": [
-								{
-									"name": "basic",
-									"label": "Basic",
-									"elements": [
-										{
-											"name": "subscriptionsApi",
-											"type": "Microsoft.Solutions.ArmApiControl",
-											"request": {
-												"method": "GET",
-												"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
-											}
-										},
-										{
-											"name": "subscriptionDropDown",
-											"type": "Microsoft.Common.DropDown",
-											"label": "Subscriptions",
-											"toolTip": "",
-											"constraints": {
-												"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
-												"required": true
-											},
-											"visible": true
-										},
-										{
-											"name": "resourceGroupsApi",
-											"type": "Microsoft.Solutions.ArmApiControl",
-											"request": {
-												"method": "GET",
-												"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
-											}
-										},
-										{
-											"name": "resourceGroupDropDown",
-											"type": "Microsoft.Common.DropDown",
-											"label": "Resource Groups",
-											"toolTip": "",
-											"constraints": {
-												"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duplomgapp-mgr-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duplomgapp-mgr-', ''), '\",\"value\":\"', item.name, '\"}')))]",
-												"required": true
-											},
-											"visible": true
-										},
-										{
-											"name": "vmListApi",
-											"type": "Microsoft.Solutions.ArmApiControl",
-											"request": {
-												"method": "POST",
-												"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
-												"body": {
-													"BackendUrl": "GetAsyncNativeHosts",
-													"Method": "GET"
-												}
-											}	
-										},
-										{
-											"name": "VmName",
-											"type": "Microsoft.Common.DropDown",
-											"label": "Virtual Machine",
-											"toolTip": "Choose one of the Virtual Machine",
-											"constraints": {
-												"allowedValues": "[map(steps('basic').vmListApi.value, (item) => parse(concat('{\"label\":\"', item.FriendlyName, '\",\"value\":\"', item.FriendlyName, '\"}')))]",
-												"required": true
-											},
-											"visible": true
-										},
-										{
-											"name": "backupPoliciesApi",
-											"type": "Microsoft.Solutions.ArmApiControl",
-											"request": {
-												"method": "POST",
-												"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
-												"body": {
-													"BackendUrl": "GetAzureVaultBackupPoliciesByTenant",
-													"Method": "GET"
-												}
-											}	
-										},
-										{
-											"name": "backupPolicy",
-											"type": "Microsoft.Common.DropDown",
-											"label": "Backup Policy",
-											"toolTip": "Choose a backup policy",
-											"defaultValue": {"id": ""},
-											"constraints": {
-												"allowedValues": "[map(steps('basic').backupPoliciesApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":', string(item), '}')))]",
-												"required": true
-											},
-											"visible": true
-										},
-										{
-												"name": "backupPolicyInfo",
-												"type": "Microsoft.Common.InfoBox",
-												"visible": true,
-												"options": {
-														"icon": "Info",
-														"text": "[concat('Backup Frequency: ', steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').backupPolicy.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ')]"
-												}
-										}						
-									]
-								}
-							],
-							"outputs": {
-								"VmName": "[steps('basic').VmName]",
-								"PolicyName": "[steps('basic').backupPolicy]"
-							}
-						}
-					},
-					"commands": [
-					],
-					"columns": [
-						{
-							"key": "name",
-							"displayName": "Name"
-						},
-						{
-							"key": "id",
-							"displayName": "Policy"
-						},
-						{
-							"key": "properties.protectionState",
-							"displayName": "Status"
-						}
-					]
-				}
-			},
+{
+	"views": [
+		{
+			"kind": "Overview",
+			"properties": {
+				"header": "Welcome to your Demo Azure Managed Application",
+				"description": "This Managed application with Custom Provider is for demo purposes only.",
+				"commands": [
+					{
+						"displayName": "Ping Action",
+						"path": "/customping",
+						"icon": "LaunchCurrent"
+					}
+				]
+			}
+		},
 		{
 			"kind": "CustomResources",
 			"properties": {
-				"displayName": "Scheduled Tasks",
+				"displayName": "VirtualMachines",
 				"version": "1.0.0.0",
-				"resourceType": "ScheduledTasks",
+				"resourceType": "VirtualMachines",
+				"createUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters": {
+						"config": {
+							"isWizard": false
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements": [
+									{
+										"name": "subscriptionsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "GET",
+											"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
+										}
+									},
+									{
+										"name": "subscriptionDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Subscriptions",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "resourceGroupsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "GET",
+											"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
+										}
+									},
+									{
+										"name": "resourceGroupDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Resource Groups",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duplomgapp-mgr-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duplomgapp-mgr-', ''), '\",\"value\":\"', item.name, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "name",
+										"label": "Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"toolTip": "Choose a name for the VM",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "type",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Instance Type",
+										"placeholder": "",
+										"defaultValue": "Standard_DS2_v2",
+										"toolTip": "Choose a size",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "B1ls (1 CPU, 0.5 GB RAM)",
+													"value": "Standard_B1ls"
+												},
+												{
+													"label": "DS1_v2 (1 CPU, 3.5 GB RAM)",
+													"value": "Standard_DS1_v2"
+												},
+												{
+													"label": "D2s_v3 (2 CPU, 8 GB RAM)",
+													"value": "Standard_D2s_v3"
+												},
+												{
+													"label": "B2s (2 CPU, 4 GB RAM)",
+													"value": "Standard_B2s"
+												},
+												{
+													"label": "DS2_v2 (2 CPU, 7 GB RAM)",
+													"value": "Standard_DS2_v2"
+												},
+												{
+													"label": "DS3_v2 (4 CPU, 14 GB RAM)",
+													"value": "Standard_DS3_v2"
+												},
+												{
+													"label": "D4s_v3 (4 CPU, 16 GB RAM)",
+													"value": "Standard_D4s_v3"
+												},
+												{
+													"label": "B4ms (4 CPU, 16 GB RAM)",
+													"value": "Standard_B4ms"
+												}
+											],
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "imageid",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Image ID",
+										"placeholder": "",
+										"defaultValue": "16.04-LTS;Canonical;UbuntuServer",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Ubuntu 16",
+													"value": "16.04-LTS;Canonical;UbuntuServer"
+												},
+												{
+													"label": "Server2016",
+													"value": "2016-Datacenter;MicrosoftWindowsServer;WindowsServer"
+												}
+											],
+											"required": true
+										},
+										"visible": true
+									}
+								]
+							},
+							{
+								"name": "networking",
+								"label": "Networking",
+								"elements": [
+									{
+										"name": "publicip",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": false,
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Yes",
+													"value": true
+												},
+												{
+													"label": "No",
+													"value": false
+												}
+											],
+											"required": true
+										},
+										"label": "Public IP"
+									},
+									{
+										"name": "joinDomain",
+										"label": "Join Domain",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": false,
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Yes",
+													"value": true
+												},
+												{
+													"label": "No",
+													"value": false
+												}
+											],
+											"required": true
+										}
+									},
+									{
+										"name": "joinLogAnalyticsWs",
+										"label": "Join LogAnalytic Workspace",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": false,
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Yes",
+													"value": true
+												},
+												{
+													"label": "No",
+													"value": false
+												}
+											],
+											"required": true
+										}
+									},
+									{
+										"name": "subnetsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"body": {
+												"BackendUrl": "GetAzureTenantSubnets",
+												"Method": "GET"
+											}
+										}	
+									},
+									{
+										"name": "subnets",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Subnets",
+										"toolTip": "Choose one of the Subnets",
+										"constraints": {
+											"allowedValues": "[map(steps('networking').subnetsApi.value, (item) => parse(concat('{\"label\":\"', item.NameEx, '\",\"value\":\"', item.NameEx, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									}
+								]
+							},
+							{
+								"name": "advanced",
+								"label": "Volumes",
+								"elements": [
+									{
+										"name": "encryption",
+										"label": "Encrypt",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": false,
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Yes",
+													"value": true
+												},
+												{
+													"label": "No",
+													"value": false
+												}
+											],
+											"required": true
+										}
+									},
+									{
+										"name": "disksize",
+										"label": "Size",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "30",
+										"toolTip": "Provide the Disk Size",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "userdata",
+										"label": "User Data",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "",
+										"toolTip": "User data",
+										"constraints": {}
+									},
+									{
+										"name": "volumes",
+										"type": "Microsoft.Common.Section",
+										"label": "Volumes",
+										"elements": [
+											{
+												"name": "tags",
+												"type": "Microsoft.Common.EditableGrid",
+												"ariaLabel": "Enter information about disks",
+												"label": "Tags",
+												"constraints": {
+													"width": "Full",
+													"rows": {
+														"count": {
+															"min": 0,
+															"max": 10
+														}
+													},
+													"columns": [
+														{
+															"id": "VolumeId",
+															"header": "Volume ID",
+															"width": "1fr",
+															"element": {
+																"name": "dropDown1",
+																"type": "Microsoft.Common.TextBox",
+																"placeholder": "1",
+																"constraints": {
+																	"required": true
+																}
+															}
+														},
+														{
+															"id": "Size",
+															"header": "Size",
+															"width": "1fr",
+															"element": {
+																"type": "Microsoft.Common.TextBox",
+																"placeholder": "100",
+																"constraints": {
+																	"required": true
+																}
+															}
+														},
+														{
+															"id": "VolumeType",
+															"header": "Snapshot ID",
+															"width": "1fr",
+															"element": {
+																"type": "Microsoft.Common.TextBox",
+																"placeholder": "Name",
+																"constraints": {
+																	"validations": [
+																	]
+																}
+															}
+														}
+													]
+												}
+											}
+										]
+									}
+								]
+							},
+							{
+								"name": "backup",
+								"label": "Backup policy",
+								"elements": [
+									{
+										"name": "backupPoliciesApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",											"body": {
+												"BackendUrl": "GetAzureVaultBackupPoliciesByTenant",
+												"Method": "GET"
+											}
+										}	
+									},
+									{
+										"name": "backupPolicy",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Backup Policy",
+										"toolTip": "Choose a backup policy",
+										"constraints": {
+											"allowedValues": "[map(steps('backup').backupPoliciesApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									}
+								]
+							},
+							{
+								"name": "patching",
+								"label": "Patching policy",
+								"elements": [
+									{
+										"name": "UpdateClassifications",
+										"label": "Update Classifications",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "Critical",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Critical",
+													"value": "Critical"
+												},
+												{
+													"label": "Security",
+													"value": "Security"
+												},
+												{
+													"label": "Other",
+													"value": "Other"
+												},
+												{
+													"label": "Unclassified",
+													"value": "Unclassified"
+												}
+											]
+										}
+									},
+									{
+										"name": "rebootSetting",
+										"label": "Reboot settings",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "RebootOnly",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "RebootOnly",
+													"value": "RebootOnly"
+												},
+												{
+													"label": "IfRequired",
+													"value": "IfRequired"
+												}
+
+											]
+										}
+									},
+									{
+										"name": "frequency",
+										"label": "Frequency",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "OneTime",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "OneTime",
+													"value": "OneTime"
+												}
+											]
+										}
+									},
+									{
+										"name": "startTime",
+										"label": "Update on",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "2020-10-28T19:00:00",
+										"toolTip": "Format of timestamp 2020-10-28T19:00:00",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "timeZone",
+										"label": "TimeZone",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "America/Los_Angeles",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "America/Los_Angeles",
+													"value": "America/Los_Angeles"
+												}
+											]
+										}
+									}
+								]
+							}
+						],
+						"outputs": {
+							"FriendlyName": "[steps('basic').name]",
+							"Capacity": "[steps('basic').type]",
+							"EncryptDisk": "[steps('advanced').encryption]",
+							"ImageId": "[steps('basic').imageid]",
+							"Base64UserData": "[steps('advanced').userdata]",
+							"AllocatedPublicIp": "[steps('networking').publicip]",
+							"Cloud": 2,
+							"MetaDataEx": {
+								"OsDiskSize": "[steps('advanced').disksize]",
+								"JoinDomain": "[steps('networking').joinDomain]",
+								"JoinLogAnalytics": "[steps('networking').joinLogAnalyticsWs]"
+							},
+							"Volumes": "[steps('advanced').volumes.tags]"
+						}
+					}
+				},
+				"editUIDefinition": {
+					"$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"version": "0.1.2-preview",
+					"parameters": {
+						"basics": [
+							{}
+						],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements": [
+									{
+										"name": "updateComponentDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Component to Update",
+										"placeholder": "",
+										"toolTip": "Choose a Component to Update",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Patch Window",
+													"value": "UpdatePolicies"
+												},
+												{
+													"label": "Backup Policy",
+													"value": "BackupPolicy"
+												}
+											],
+											"required": true
+										},
+										"visible": true
+									  },
+									{
+										"name": "VmId",
+										"label": "Vm ID",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValuePath": "id",
+										"constraints": {}
+									},
+									{
+										"name": "VmName",
+										"label": "Vm Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValuePath": "properties.FriendlyName",
+										"constraints": {}
+									},
+									{
+										"name": "osType",
+										"label": "OS Type",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValuePath": "properties.OsPlatform",
+										"visible": "[equals(steps('basic').updateComponentDropDown, 'UpdatePolicies')]",
+										"toolTip": "Format of timestamp 2020-10-28T19:00:00"
+									},
+									{
+										"name": "UpdateClassifications",
+										"label": "Linux Update Classifications",
+										"type": "Microsoft.Common.DropDown",
+										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdatePolicies'), empty(steps('basic').osType))]",
+										"defaultValue": "Critical",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Critical",
+													"value": "Critical"
+												},
+												{
+													"label": "Security",
+													"value": "Security"
+												},
+												{
+													"label": "Other",
+													"value": "Other"
+												},
+												{
+													"label": "Unclassified",
+													"value": "Unclassified"
+												}
+											]
+										}
+									},
+									{
+										"name": "WindowsUpdateClassifications",
+										"label": "Windows Update Classifications",
+										"type": "Microsoft.Common.DropDown",
+										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdatePolicies'), equals(steps('basic').osType, 'Windows'))]",
+										"defaultValue": "Critical",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Critical",
+													"value": "Critical"
+												},
+												{
+													"label": "Security",
+													"value": "Security"
+												},
+												{
+													"label": "UpdateRollup",
+													"value": "UpdateRollup"
+												},
+												{
+													"label": "FeaturePack",
+													"value": "FeaturePack"
+												},
+												{
+													"label": "ServicePack",
+													"value": "ServicePack"
+												},
+												{
+													"label": "Definition",
+													"value": "Definition"
+												},
+												{
+													"label": "Tools",
+													"value": "Tools"
+												},
+												{
+													"label": "Updates",
+													"value": "Updates"
+												}
+											]
+										}
+									},
+									{
+										"name": "rebootSetting",
+										"label": "Reboot settings",
+										"type": "Microsoft.Common.DropDown",
+										"visible": "[equals(steps('basic').updateComponentDropDown, 'UpdatePolicies')]",
+										"defaultValue": "IfRequired",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "RebootOnly",
+													"value": "RebootOnly"
+												},
+												{
+													"label": "IfRequired",
+													"value": "IfRequired"
+												}
+
+											]
+										}
+									},
+									{
+										"name": "frequency",
+										"label": "Frequency",
+										"visible": "[equals(steps('basic').updateComponentDropDown, 'UpdatePolicies')]",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "OneTime",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "OneTime",
+													"value": "OneTime"
+												}
+											]
+										}
+									},
+									{
+										"name": "startTime",
+										"label": "Update on",
+										"visible": "[equals(steps('basic').updateComponentDropDown, 'UpdatePolicies')]",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "2020-10-28T19:00:00",
+										"toolTip": "Format of timestamp 2020-10-28T19:00:00",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "timeZone",
+										"label": "TimeZone",
+										"visible": "[equals(steps('basic').updateComponentDropDown, 'UpdatePolicies')]",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "America/Los_Angeles",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "America/Los_Angeles",
+													"value": "America/Los_Angeles"
+												}
+											]
+										}
+									},
+									{
+									  "name": "emptyBackupPolicyInfo",
+									  "type": "Microsoft.Common.InfoBox",
+									  "visible": "[and(equals(steps('basic').updateComponentDropDown, 'BackupPolicy'), empty(steps('basic').currentBackupPolicyApi))]",
+									  "options": {
+										"icon": "Info",
+										"text": "Backup policy is not configured for this VM. Select any policy from the below to attach."
+									  }
+									},
+									{
+										"name": "currentBackupPolicyApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat(steps('basic').VmId, '/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"body": {
+												"BackendUrl": "GetAzureVaultBackupPolicyByVm/<VmName>",
+												"Method": "GET"
+											}
+										}	
+									},
+									{
+											"name": "currentBackupPolicyInfo",
+											"type": "Microsoft.Common.InfoBox",
+											"visible": "[and(equals(steps('basic').updateComponentDropDown, 'BackupPolicy'),not(empty(steps('basic').currentBackupPolicyApi)))]",
+											"toolTip": "Current Backup Policy",
+											"options": {
+													"icon": "Info",
+													"text": "[concat('Backup Frequency: ', steps('basic').currentBackupPolicyApi.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').currentBackupPolicyApi.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').currentBackupPolicyApi.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ', first(steps('basic').currentBackupPolicyApi.properties.retentionPolicy.retentionTimes))]"
+											}
+									},
+									{
+										"name": "backupPoliciesApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat(first(split(steps('basic').VmId, '/VirtualMachines')), '/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"body": {
+												"BackendUrl": "GetAzureVaultBackupPoliciesByTenant",
+												"Method": "GET"
+											}
+										}	
+									},										
+									{
+										"name": "backupPolicy",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Select New Backup Policy",
+										"visible": "[equals(steps('basic').updateComponentDropDown, 'BackupPolicy')]",
+										"toolTip": "Choose a backup policy",
+										"defaultValue": "",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').backupPoliciesApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":', string(item), '}')))]",
+											"required": true
+										}
+									},
+									{
+											"name": "backupPolicyInfo",
+											"type": "Microsoft.Common.InfoBox",
+											"visible": "[and(equals(steps('basic').updateComponentDropDown, 'BackupPolicy'), not(empty(steps('basic').backupPolicy.properties)))]",
+											"options": {
+													"icon": "Info",
+													"text": "[concat('Backup Frequency: ', steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').backupPolicy.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ', first(steps('basic').backupPolicy.properties.retentionPolicy.retentionTimes))]"
+											}
+									}
+								]
+							}
+						],
+						"outputs": {
+							"updateType": "[steps('basic').updateComponentDropDown]",
+							"VmName": "[steps('basic').VmName]",
+							"properties": {
+								"updateConfiguration": {
+									"linux": {
+										"includedPackageClassifications": "[steps('basic').UpdateClassifications]",
+										"rebootSetting": "[steps('basic').rebootSetting]"
+									},
+									"windows": {
+										"includedUpdateClassifications": "[steps('basic').WindowsUpdateClassifications]",
+										"rebootSetting": "[steps('basic').rebootSetting]"
+									}
+								},
+								"scheduleInfo": {
+									"frequency": "[steps('basic').frequency]",
+									"startTime": "[concat(steps('basic').startTime, '+00:00')]",
+									"timeZone": "[steps('basic').timeZone]"
+								}
+							}
+						}
+					}
+				},
+				"commands": [
+					{
+						"displayName": "Start",
+						"path": "VirtualMachines/startAzureHost",
+						"icon": "Start"
+					},
+					{
+						"displayName": "Stop",
+						"path": "VirtualMachines/stopAzureHost",
+						"icon": "Stop"
+					},
+					{
+						"displayName": "Backup Policy",
+						"path": "VirtualMachines/ProxyPost",
+						"icon": "Link",
+						"createUIDefinition": {
+							"$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+							"handler": "Microsoft.Azure.CreateUIDef",
+							"version": "0.1.2-preview",
+							"parameters": {
+								"basics": [
+									{}
+								],
+								"steps": [
+									{
+										"name": "storageConfig",
+										"label": "Storage settings",
+										"elements": [
+											{
+												"name": "LgWsName",
+												"label": "Workspace Name",
+												"type": "Microsoft.Common.TextBox",
+												"defaultValuePath": "properties.FriendlyName",
+												"constraints": {}
+											}
+										]
+									}
+								],
+								"outputs": {
+									"storageAccountNamePrefix": "[steps('storageConfig').storageAccounts.prefix]",
+									"storageAccountType": "[steps('storageConfig').storageAccounts.type]",
+									"location": "[location()]",
+									"tagsByResource": "[steps('tags').tagsByResource]"
+								}
+							}
+						}
+					}
+				],
+				"columns": [
+					{
+						"key": "properties.FriendlyName",
+						"displayName": "Full Name"
+					},
+					{
+						"key": "properties.Status",
+						"displayName": "Status"
+					},
+					{
+						"key": "properties.PrivateIpAddress",
+						"displayName": "Priavte IP",
+						"optional": true
+					},
+					{
+						"key": "properties.BackupStatus.lastBackupTime",
+						"displayName": "Last Backup",
+						"optional": true
+					}
+				]
+			}
+		},
+		{
+			"kind": "CustomResources",
+			"properties": {
+				"displayName": "Patching Window",
+				"version": "1.0.0.0",
+				"resourceType": "UpdatePolicies",
 				"createUIDefinition": {
 					"handler": "Microsoft.Azure.CreateUIDef",
 					"parameters": {
@@ -1201,83 +903,139 @@
 										"visible": true
 									},
 									{
-										"name": "TaskType",
-										"label": "Task Action",
-										"type": "Microsoft.Common.DropDown",
-										"defaultValue": 1,
-										"constraints": {
-											"allowedValues": [
-												{
-													"label": "Stop",
-													"value": 1
-												},
-												{
-													"label": "Start",
-													"value": 2
-												},
-												{
-													"label": "Backup",
-													"value": 0
-												}
-											]
-										}
-									},
-									{
-										"name": "DaysOfWeek",
-										"label": "Days Of Week",
-										"type": "Microsoft.Common.DropDown",
-										"defaultValue": "",
-										"constraints": {
-											"allowedValues": [
-												{
-													"label": "Sunday",
-													"value": "sun"
-												},
-												{
-													"label": "Monday",
-													"value": "mon"
-												},
-												{
-													"label": "Tuesday",
-													"value": "tue"
-												},
-												{
-													"label": "Wednesday",
-													"value": "wed"
-												},												{
-													"label": "Thursday",
-													"value": "thu"
-												},
-												{
-													"label": "Friday",
-													"value": "fri"
-												},
-												{
-													"label": "Saturday",
-													"value": "sat"
-												}
-											]
-										}
-									},
-									{
-										"name": "TimeOfDay",
-										"label": "Time Of Day",
+										"name": "osType",
+										"label": "OS Type",
 										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "00:00:00",
-										"toolTip": "Format of time in HH:MM:SS",
+										"defaultValue": "[if(empty(steps('basic').vmListApi.value), steps('basic').VmName, steps('basic').VmName)]",
+										"toolTip": "Format of timestamp 2020-10-28T19:00:00"
+									},
+									{
+										"name": "UpdateClassifications",
+										"label": "Update Classifications",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "Critical",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Critical",
+													"value": "Critical"
+												},
+												{
+													"label": "Security",
+													"value": "Security"
+												},
+												{
+													"label": "Other",
+													"value": "Other"
+												},
+												{
+													"label": "Unclassified",
+													"value": "Unclassified"
+												}
+											]
+										}
+									},
+									{
+										"name": "WindowsUpdateClassifications",
+										"label": "Windows Update Classifications",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "Critical",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Critical",
+													"value": "Critical"
+												},
+												{
+													"label": "Security",
+													"value": "Security"
+												},
+												{
+													"label": "Other",
+													"value": "Other"
+												},
+												{
+													"label": "Unclassified",
+													"value": "Unclassified"
+												}
+											]
+										}
+									},
+									{
+										"name": "rebootSetting",
+										"label": "Reboot settings",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "RebootOnly",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "RebootOnly",
+													"value": "RebootOnly"
+												},
+												{
+													"label": "IfRequired",
+													"value": "IfRequired"
+												}
+
+											]
+										}
+									},
+									{
+										"name": "frequency",
+										"label": "Frequency",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "OneTime",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "OneTime",
+													"value": "OneTime"
+												}
+											]
+										}
+									},
+									{
+										"name": "startTime",
+										"label": "Update on",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "2020-10-28T19:00:00",
+										"toolTip": "Format of timestamp 2020-10-28T19:00:00",
 										"constraints": {
 											"required": true
+										}
+									},
+									{
+										"name": "timeZone",
+										"label": "TimeZone",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "America/Los_Angeles",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "America/Los_Angeles",
+													"value": "America/Los_Angeles"
+												}
+											]
 										}
 									}
 								]
 							}
 						],
 						"outputs": {
-							"ComponentId": "[steps('basic').VmName]",
-							"TaskType": "[steps('basic').TaskType]",
-							"Cloud": 2,
-							"TimeOfDay": "[steps('basic').TimeOfDay]",
-							"DaysOfWeek": "[steps('basic').DaysOfWeek]"
+							"VmName": "[steps('basic').VmName]",
+							"properties": {
+								"updateConfiguration": {
+									"linux": {
+										"includedUpdateClassifications": "[steps('basic').UpdateClassifications]",
+										"rebootSetting": "[steps('basic').rebootSetting]"
+									}
+								},
+								"scheduleInfo": {
+									"frequency": "[steps('basic').frequency]",
+									"startTime": "[concat(steps('basic').startTime, '+00:00')]",
+									"timeZone": "[steps('basic').timeZone]"
+								}
+							}
 						}
 					}
 				},
@@ -1289,23 +1047,205 @@
 						"displayName": "Name"
 					},
 					{
-						"key": "properties.ComponentId",
-						"displayName": "Virtual Machine"
+						"key": "properties_frequency",
+						"displayName": "Frequency"
 					},
 					{
-						"key": "properties.TaskType",
-						"displayName": "Task Type"
+						"key": "properties_nextRun",
+						"displayName": "Next Run"
 					},
 					{
-						"key": "properties.DaysOfWeek",
-						"displayName": "Days Of Week"
-					},
-					{
-						"key": "properties.TimeOfDay",
-						"displayName": "Time Of Day"
+						"key": "properties_updateConfiguration.duration",
+						"displayName": "Duration"
 					}
 				]
 			}
+		},
+	{
+		"kind": "CustomResources",
+		"properties": {
+			"displayName": "Scheduled Tasks",
+			"version": "1.0.0.0",
+			"resourceType": "ScheduledTasks",
+			"createUIDefinition": {
+				"handler": "Microsoft.Azure.CreateUIDef",
+				"parameters": {
+					"config": {
+						"isWizard": true
+					},
+					"basics": [],
+					"steps": [
+						{
+							"name": "basic",
+							"label": "Basic",
+							"elements": [
+								{
+									"name": "subscriptionsApi",
+									"type": "Microsoft.Solutions.ArmApiControl",
+									"request": {
+										"method": "GET",
+										"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
+									}
+								},
+								{
+									"name": "subscriptionDropDown",
+									"type": "Microsoft.Common.DropDown",
+									"label": "Subscriptions",
+									"toolTip": "",
+									"constraints": {
+										"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
+										"required": true
+									},
+									"visible": true
+								},
+								{
+									"name": "resourceGroupsApi",
+									"type": "Microsoft.Solutions.ArmApiControl",
+									"request": {
+										"method": "GET",
+										"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
+									}
+								},
+								{
+									"name": "resourceGroupDropDown",
+									"type": "Microsoft.Common.DropDown",
+									"label": "Resource Groups",
+									"toolTip": "",
+									"constraints": {
+										"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duplomgapp-mgr-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duplomgapp-mgr-', ''), '\",\"value\":\"', item.name, '\"}')))]",
+										"required": true
+									},
+									"visible": true
+								},
+								{
+									"name": "vmListApi",
+									"type": "Microsoft.Solutions.ArmApiControl",
+									"request": {
+										"method": "POST",
+										"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
+										"body": {
+											"BackendUrl": "GetAsyncNativeHosts",
+											"Method": "GET"
+										}
+									}	
+								},
+								{
+									"name": "VmName",
+									"type": "Microsoft.Common.DropDown",
+									"label": "Virtual Machine",
+									"toolTip": "Choose one of the Virtual Machine",
+									"constraints": {
+										"allowedValues": "[map(steps('basic').vmListApi.value, (item) => parse(concat('{\"label\":\"', item.FriendlyName, '\",\"value\":\"', item.FriendlyName, '\"}')))]",
+										"required": true
+									},
+									"visible": true
+								},
+								{
+									"name": "TaskType",
+									"label": "Task Action",
+									"type": "Microsoft.Common.DropDown",
+									"defaultValue": 1,
+									"constraints": {
+										"allowedValues": [
+											{
+												"label": "Stop",
+												"value": 1
+											},
+											{
+												"label": "Start",
+												"value": 2
+											},
+											{
+												"label": "Backup",
+												"value": 0
+											}
+										]
+									}
+								},
+								{
+									"name": "DaysOfWeek",
+									"label": "Days Of Week",
+									"type": "Microsoft.Common.DropDown",
+									"defaultValue": "",
+									"constraints": {
+										"allowedValues": [
+											{
+												"label": "Sunday",
+												"value": "sun"
+											},
+											{
+												"label": "Monday",
+												"value": "mon"
+											},
+											{
+												"label": "Tuesday",
+												"value": "tue"
+											},
+											{
+												"label": "Wednesday",
+												"value": "wed"
+											},												{
+												"label": "Thursday",
+												"value": "thu"
+											},
+											{
+												"label": "Friday",
+												"value": "fri"
+											},
+											{
+												"label": "Saturday",
+												"value": "sat"
+											}
+										]
+									}
+								},
+								{
+									"name": "TimeOfDay",
+									"label": "Time Of Day",
+									"type": "Microsoft.Common.TextBox",
+									"defaultValue": "00:00:00",
+									"toolTip": "Format of time in HH:MM:SS",
+									"constraints": {
+										"required": true
+									}
+								}
+							]
+						}
+					],
+					"outputs": {
+						"ComponentId": "[steps('basic').VmName]",
+						"TaskType": "[steps('basic').TaskType]",
+						"Cloud": 2,
+						"TimeOfDay": "[steps('basic').TimeOfDay]",
+						"DaysOfWeek": "[steps('basic').DaysOfWeek]"
+					}
+				}
+			},
+			"commands": [
+			],
+			"columns": [
+				{
+					"key": "name",
+					"displayName": "Name"
+				},
+				{
+					"key": "properties.ComponentId",
+					"displayName": "Virtual Machine"
+				},
+				{
+					"key": "properties.TaskType",
+					"displayName": "Task Type"
+				},
+				{
+					"key": "properties.DaysOfWeek",
+					"displayName": "Days Of Week"
+				},
+				{
+					"key": "properties.TimeOfDay",
+					"displayName": "Time Of Day"
+				}
+			]
 		}
-	]
+	}
+]
 }
