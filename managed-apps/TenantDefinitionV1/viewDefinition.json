@@ -162,11 +162,11 @@
 											"allowedValues": [
 												{
 													"label": "Yes",
-													"value": "true"
+													"value": true
 												},
 												{
 													"label": "No",
-													"value": "false"
+													"value": false
 												}
 											],
 											"required": true
@@ -182,11 +182,11 @@
 											"allowedValues": [
 												{
 													"label": "Yes",
-													"value": "true"
+													"value": true
 												},
 												{
 													"label": "No",
-													"value": "false"
+													"value": false
 												}
 											],
 											"required": true
@@ -201,11 +201,11 @@
 											"allowedValues": [
 												{
 													"label": "Yes",
-													"value": "true"
+													"value": true
 												},
 												{
 													"label": "No",
-													"value": "false"
+													"value": false
 												}
 											],
 											"required": true
@@ -296,32 +296,19 @@
 														}
 													},
 													"columns": [
-															{
-																"id": "Name",
-																"header": "Name",
-																"width": "1fr",
-																"element": {
-																	"name": "name",
-																	"type": "Microsoft.Common.TextBox",
-																	"placeholder": "disk1",
-																	"constraints": {
-																		"required": true
-																	}
+														{
+															"id": "VolumeId",
+															"header": "Volume ID",
+															"width": "1fr",
+															"element": {
+																"name": "dropDown1",
+																"type": "Microsoft.Common.TextBox",
+																"placeholder": "1",
+																"constraints": {
+																	"required": true
 																}
-															},
-															{
-																"id": "VolumeId",
-																"header": "Volume ID",
-																"width": "1fr",
-																"element": {
-																	"name": "dropDown1",
-																	"type": "Microsoft.Common.TextBox",
-																	"placeholder": "1",
-																	"constraints": {
-																		"required": true
-																	}
-																}
-															},
+															}
+														},
 														{
 															"id": "Size",
 															"header": "Size",
@@ -382,116 +369,111 @@
 									}
 								]
 							},
-								{
-									"name": "patching",
-									"label": "Patching policy",
-									"elements": [
-										{
-											"name": "UpdateClassifications",
-											"label": "Update Classifications",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "Critical",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "Critical",
-														"value": "Critical"
-													},
-													{
-														"label": "Security",
-														"value": "Security"
-													},
-													{
-														"label": "Other",
-														"value": "Other"
-													},
-													{
-														"label": "Unclassified",
-														"value": "Unclassified"
-													}
-												]
-											}
-										},
-										{
-											"name": "rebootSetting",
-											"label": "Reboot settings",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "IfRequired",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "RebootOnly",
-														"value": "RebootOnly"
-													},
-													{
-														"label": "IfRequired",
-														"value": "IfRequired"
-													}
-
-												]
-											}
-										},
-										{
-											"name": "frequency",
-											"label": "Frequency",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "OneTime",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "OneTime",
-														"value": "OneTime"
-													}
-												]
-											}
-										},
-										{
-											"name": "startTime",
-											"label": "Update on",
-											"type": "Microsoft.Common.TextBox",
-											"defaultValue": "2021-01-01T12:00:00",
-											"toolTip": "Format of timestamp 2020-10-28T19:00:00",
-											"constraints": {
-												"required": true
-											}
-										},
-										{
-											"name": "timeZone",
-											"label": "TimeZone",
-											"type": "Microsoft.Common.DropDown",
-											"defaultValue": "America/Los_Angeles",
-											"constraints": {
-												"allowedValues": [
-													{
-														"label": "America/Los_Angeles",
-														"value": "America/Los_Angeles"
-													}
-												]
-											}
+							{
+								"name": "patching",
+								"label": "Patching policy",
+								"elements": [
+									{
+										"name": "UpdateClassifications",
+										"label": "Update Classifications",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "Critical",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Critical",
+													"value": "Critical"
+												},
+												{
+													"label": "Security",
+													"value": "Security"
+												},
+												{
+													"label": "Other",
+													"value": "Other"
+												},
+												{
+													"label": "Unclassified",
+													"value": "Unclassified"
+												}
+											]
 										}
-									]
-								}
-							],
-							"outputs": {
-								"ArmTemplateDeployment": "true",
-								"properties": {
-									"FriendlyName": {"value": "[steps('basic').name]"},
-									"Capacity": {"value": "[steps('basic').type]"},
-									"ImageId": {"value": "[steps('basic').imageid]"},
-									"OsDiskSize": {"value": "[steps('advanced').disksize]"},
-									"JoinDomain": {"value": "[steps('networking').joinDomain]"},
-									"joinLogAnalyticsWs": {"value": "[steps('networking').joinLogAnalyticsWs]"},
-									"Volumes": {"value": "[steps('advanced').volumes.tags]"},
-									"AllocatedPublicIp": {"value": "[steps('networking').publicip]"},
-									"EncryptDisk": {"value": "[steps('advanced').encryption]"},
-									"UpdateClassifications": {"value": "[steps('patching').UpdateClassifications]"},
-									"rebootSetting": {"value": "[steps('patching').rebootSetting]"},
-									"frequency": {"value": "[steps('patching').frequency]"},
-									"startTime": {"value": "[steps('patching').startTime]"},
-									"timeZone": {"value": "[steps('patching').timeZone]"},
-									"BackupPolicyName": {"value": "[steps('backup').backupPolicy]"}
-								}
+									},
+									{
+										"name": "rebootSetting",
+										"label": "Reboot settings",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "RebootOnly",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "RebootOnly",
+													"value": "RebootOnly"
+												},
+												{
+													"label": "IfRequired",
+													"value": "IfRequired"
+												}
+
+											]
+										}
+									},
+									{
+										"name": "frequency",
+										"label": "Frequency",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "OneTime",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "OneTime",
+													"value": "OneTime"
+												}
+											]
+										}
+									},
+									{
+										"name": "startTime",
+										"label": "Update on",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "2020-10-28T19:00:00",
+										"toolTip": "Format of timestamp 2020-10-28T19:00:00",
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "timeZone",
+										"label": "TimeZone",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "America/Los_Angeles",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "America/Los_Angeles",
+													"value": "America/Los_Angeles"
+												}
+											]
+										}
+									}
+								]
 							}
+						],
+						"outputs": {
+							"FriendlyName": "[steps('basic').name]",
+							"Capacity": "[steps('basic').type]",
+							"EncryptDisk": "[steps('advanced').encryption]",
+							"ImageId": "[steps('basic').imageid]",
+							"Base64UserData": "[steps('advanced').userdata]",
+							"AllocatedPublicIp": "[steps('networking').publicip]",
+							"Cloud": 2,
+							"MetaDataEx": {
+								"OsDiskSize": "[steps('advanced').disksize]",
+								"JoinDomain": "[steps('networking').joinDomain]",
+								"JoinLogAnalytics": "[steps('networking').joinLogAnalyticsWs]"
+							},
+							"Volumes": "[steps('advanced').volumes.tags]"
+						}
 					}
 				},
 				"editUIDefinition": {
@@ -518,6 +500,14 @@
 												{
 													"label": "Change Disk Parameters",
 													"value": "UpdateDisk"
+												},
+												{
+													"label": "Add new Data Disks",
+													"value": "AddDisks"
+												},
+												{
+													"label": "Resize Instance",
+													"value": "ResizeInstance"
 												}
 											],
 											"required": true
@@ -539,6 +529,60 @@
 										"constraints": {}
 									},
 									{
+										"name": "VmSize",
+										"label": "Current Vm Size",
+										"type": "Microsoft.Common.TextBox",
+										"visible": "[equals(steps('basic').updateComponentDropDown, 'ResizeInstance')]",
+										"defaultValuePath": "properties.Capacity",
+										"constraints": {}
+									},
+									{
+										"name": "instanceSize",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Choose a new Size for the VM",
+										"placeholder": "",
+										"visible": "[equals(steps('basic').updateComponentDropDown, 'ResizeInstance')]",
+										"defaultValue": "Standard_DS2_v2",
+										"toolTip": "Choose a size",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "B1ls (1 CPU, 0.5 GB RAM)",
+													"value": "Standard_B1ls"
+												},
+												{
+													"label": "DS1_v2 (1 CPU, 3.5 GB RAM)",
+													"value": "Standard_DS1_v2"
+												},
+												{
+													"label": "D2s_v3 (2 CPU, 8 GB RAM)",
+													"value": "Standard_D2s_v3"
+												},
+												{
+													"label": "B2s (2 CPU, 4 GB RAM)",
+													"value": "Standard_B2s"
+												},
+												{
+													"label": "DS2_v2 (2 CPU, 7 GB RAM)",
+													"value": "Standard_DS2_v2"
+												},
+												{
+													"label": "DS3_v2 (4 CPU, 14 GB RAM)",
+													"value": "Standard_DS3_v2"
+												},
+												{
+													"label": "D4s_v3 (4 CPU, 16 GB RAM)",
+													"value": "Standard_D4s_v3"
+												},
+												{
+													"label": "B4ms (4 CPU, 16 GB RAM)",
+													"value": "Standard_B4ms"
+												}
+											],
+											"required": true
+										}
+									},
+									{
 										"name": "vmDetailsApi",
 										"type": "Microsoft.Solutions.ArmApiControl",
 										"request": {
@@ -554,9 +598,72 @@
 										"toolTip": "Select Disk to Update",
 										"defaultValue": "",
 										"constraints": {
-											"allowedValues": "[map(steps('basic').vmDetailsApi.properties.Volumes, (item) => parse(concat('{\"label\":\"', item.Name, '\",\"value\":\"', string(item.Size), '\"}')))]",
+											"allowedValues": "[map(steps('basic').vmDetailsApi.properties.Volumes, (item) => parse(concat('{\"label\":\"', item.Name, '\",\"value\":', string(item), '}')))]",
 											"required": true
 										}
+									},
+									{
+										"name": "newDataDisks",
+										"type": "Microsoft.Common.Section",
+										"label": "Add new Data Disks",
+										"visible": "[equals(steps('basic').updateComponentDropDown, 'AddDisks')]",
+										"elements": [
+											{
+												"name": "tags",
+												"type": "Microsoft.Common.EditableGrid",
+												"ariaLabel": "Enter information about disks",
+												"label": "Tags",
+												"constraints": {
+													"width": "Full",
+													"rows": {
+														"count": {
+															"min": 0,
+															"max": 10
+														}
+													},
+													"columns": [
+														{
+															"id": "VolumeId",
+															"header": "Volume ID",
+															"width": "1fr",
+															"element": {
+																"name": "dropDown1",
+																"type": "Microsoft.Common.TextBox",
+																"placeholder": "1",
+																"constraints": {
+																	"required": true
+																}
+															}
+														},
+														{
+															"id": "Size",
+															"header": "Size",
+															"width": "1fr",
+															"element": {
+																"type": "Microsoft.Common.TextBox",
+																"placeholder": "100",
+																"constraints": {
+																	"required": true
+																}
+															}
+														},
+														{
+															"id": "VolumeType",
+															"header": "Snapshot ID",
+															"width": "1fr",
+															"element": {
+																"type": "Microsoft.Common.TextBox",
+																"placeholder": "Name",
+																"constraints": {
+																	"validations": [
+																	]
+																}
+															}
+														}
+													]
+												}
+											}
+										]
 									},
 									{
 											"name": "vmDisksEmptyInfo",
@@ -570,12 +677,20 @@
 									{
 										"name": "currentDiskInfo",
 										"type": "Microsoft.Common.InfoBox",
-										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdateDisk'), greater(length(steps('basic').vmDetailsApi.properties.Volumes), 0))]",
+										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdateDisk'), greater(length(steps('basic').vmDetailsApi.properties.Volumes), 0), not(empty(steps('basic').vmDisksDropDown)))]",
 										"toolTip": "Current Backup Policy",
 										"options": {
 												"icon": "Info",
-												"text": "[concat('Current Size: ', string(steps('basic').vmDisksDropDown))]"
+												"text": "[concat('Current Disk Size: ', string(steps('basic').vmDisksDropDown.Size), 'GB; Volume Type: ',  string(steps('basic').vmDisksDropDown.VolumeType))]"
 										}
+									},
+									{
+										"name": "updateDiskSize",
+										"label": "Update Disk Size",
+										"type": "Microsoft.Common.TextBox",
+										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdateDisk'), greater(length(steps('basic').vmDetailsApi.properties.Volumes), 0),not(empty(steps('basic').vmDisksDropDown)))]",
+										"defaultValue": "",
+										"constraints": {}
 									}
 								]
 							}
