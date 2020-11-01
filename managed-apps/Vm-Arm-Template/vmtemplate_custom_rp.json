@@ -31,23 +31,15 @@
       }
     },
     "JoinDomain": {
-      "type": "string",
-      "defaultValue": "false",
-      "allowedValues": [
-        "true",
-        "false"
-      ],
+      "type": "bool",
+      "defaultValue": false,
       "metadata": {
         "description": "Join Domain"
       }
     },
     "joinLogAnalyticsWs": {
-      "type": "string",
-      "defaultValue": "true",
-      "allowedValues": [
-        "true",
-        "false"
-      ],
+      "type": "bool",
+      "defaultValue": false,
       "metadata": {
         "description": "Join Log Analytics Workspace"
       }
@@ -113,6 +105,20 @@
       "metadata": {
         "description": "BackupPolicyName"
       }
+    },
+    "SetBackupPolicy": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Skip BackupPolicy"
+      }
+    },
+    "SetPathcing": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Skip Pathcing"
+      }
     }
   },
   "resources": [
@@ -140,6 +146,7 @@
       "type": "Microsoft.Resources/deploymentScripts",
       "apiVersion": "2019-10-01-preview",
       "name": "[concat('waitScript', parameters('FriendlyName'))]",
+      "condition": "[parameters('SetBackupPolicy')]",
       "location": "eastus",
       "kind": "AzureCLI",
       "identity": {
@@ -156,9 +163,9 @@
         "AzCliVersion": "2.0.80",
         "environmentVariables": [],
         "arguments": "'azdemo1','log-aqlg5r'",
-        "scriptContent": "#!/bin/bash\nsleep 2400",
+        "scriptContent": "#!/bin/bash\nsleep 3600",
         "supportingScriptUris": [],
-        "timeout": "PT50M",
+        "timeout": "PT01H10M",
         "cleanupPreference": "OnSuccess",
         "retentionInterval": "P1D"
       }
@@ -166,6 +173,7 @@
     {
       "type": "Microsoft.CustomProviders/resourceProviders/UpdatePolicies",
       "name": "[concat('public/', parameters('FriendlyName'))]",
+      "condition": "[parameters('SetBackupPolicy')]",
       "apiVersion": "2018-09-01-preview",
       "location": "EAST US",
       "dependsOn": [
@@ -195,6 +203,7 @@
     {
       "type": "Microsoft.CustomProviders/resourceProviders/ProtectedVM",
       "name": "[concat('public/', parameters('FriendlyName'))]",
+      "condition": "[parameters('SetBackupPolicy')]",
       "apiVersion": "2018-09-01-preview",
       "location": "EAST US",
       "dependsOn": [
