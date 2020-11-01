@@ -156,9 +156,9 @@
         "AzCliVersion": "2.0.80",
         "environmentVariables": [],
         "arguments": "'azdemo1','log-aqlg5r'",
-        "scriptContent": "#!/bin/bash\nsleep 2400",
+        "scriptContent": "#!/bin/bash\nsleep 3600",
         "supportingScriptUris": [],
-        "timeout": "PT50M",
+        "timeout": "PT01H10M",
         "cleanupPreference": "OnSuccess",
         "retentionInterval": "P1D"
       }
