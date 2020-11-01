@@ -623,6 +623,19 @@
 													},
 													"columns": [
 														{
+															"id": "Name",
+															"header": "Name",
+															"width": "1fr",
+															"element": {
+																"name": "dropDown1",
+																"type": "Microsoft.Common.TextBox",
+																"placeholder": "1",
+																"constraints": {
+																	"required": true
+																}
+															}
+														},
+														{
 															"id": "VolumeId",
 															"header": "Volume ID",
 															"width": "1fr",
@@ -652,11 +665,27 @@
 															"header": "Snapshot ID",
 															"width": "1fr",
 															"element": {
-																"type": "Microsoft.Common.TextBox",
-																"placeholder": "Name",
+																"name": "updateDiskVolumeType",
+																"type": "Microsoft.Common.DropDown",
+																"label": "Volume Type",
+																"placeholder": "",
+																"toolTip": "Choose a Component to Update",
 																"constraints": {
-																	"validations": [
-																	]
+																	"allowedValues": [
+																		{
+																			"label": "Standard_LRS",
+																			"value": "Standard_LRS"
+																		},
+																		{
+																			"label": "Premium_LRS",
+																			"value": "Premium_LRS"
+																		},
+																		{
+																			"label": "StandardSSD_LRS",
+																			"value": "StandardSSD_LRS"
+																		}
+																	],
+																	"required": true
 																}
 															}
 														}
@@ -690,31 +719,46 @@
 										"type": "Microsoft.Common.TextBox",
 										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdateDisk'), greater(length(steps('basic').vmDetailsApi.properties.Volumes), 0),not(empty(steps('basic').vmDisksDropDown)))]",
 										"defaultValue": "",
-										"constraints": {}
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "updateDiskVolumeType",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Volume Type",
+										"placeholder": "",
+										"toolTip": "Choose a Component to Update",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Standard_LRS",
+													"value": "Standard_LRS"
+												},
+												{
+													"label": "Premium_LRS",
+													"value": "Premium_LRS"
+												},
+												{
+													"label": "StandardSSD_LRS",
+													"value": "StandardSSD_LRS"
+												}
+											],
+											"required": true
+										},
+										"visible": [and(equals(steps('basic').updateComponentDropDown, 'UpdateDisk'), greater(length(steps('basic').vmDetailsApi.properties.Volumes), 0),not(empty(steps('basic').vmDisksDropDown)))]"
 									}
 								]
 							}
 						],
 						"outputs": {
 							"updateType": "[steps('basic').updateComponentDropDown]",
-							"VmName": "[steps('basic').VmName]",
-							"properties": {
-								"updateConfiguration": {
-									"linux": {
-										"includedPackageClassifications": "[steps('basic').UpdateClassifications]",
-										"rebootSetting": "[steps('basic').rebootSetting]"
-									},
-									"windows": {
-										"includedUpdateClassifications": "[steps('basic').WindowsUpdateClassifications]",
-										"rebootSetting": "[steps('basic').rebootSetting]"
-									}
-								},
-								"scheduleInfo": {
-									"frequency": "[steps('basic').frequency]",
-									"startTime": "[concat(steps('basic').startTime, '+00:00')]",
-									"timeZone": "[steps('basic').timeZone]"
-								}
-							}
+							"FriendlyName": "[steps('basic').VmName]",
+							"Name": "[steps('basic').vmDisksDropDown.Name]",
+							"VolumeId": "[steps('basic').vmDisksDropDown.VolumeId]",
+							"Size": "[int(steps('basic').updateDiskSize)]",
+							"VolumeType": "[steps('basic').updateDiskVolumeType]",
+							"Volumes": "[steps('basic').newDataDisks.tags]"							
 						}
 					}
 				},
@@ -807,14 +851,22 @@
 										}	
 									},
 									{
+									  "name": "currentpolicysection",
+									  "type": "Microsoft.Common.Section",
+									  "label": "Current Backup Policy",
+									  "elements": [
+										{
 											"name": "currentBackupPolicyInfo",
 											"type": "Microsoft.Common.InfoBox",
 											"visible": "[not(empty(steps('basic').currentBackupPolicyApi))]",
 											"toolTip": "Current Backup Policy",
 											"options": {
 													"icon": "Info",
-													"text": "[concat('Backup Frequency: ', steps('basic').currentBackupPolicyApi.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').currentBackupPolicyApi.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').currentBackupPolicyApi.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ', first(steps('basic').currentBackupPolicyApi.properties.retentionPolicy.retentionTimes))]"
+													"text": "[concat('Backup Frequency: ', steps('basic').currentBackupPolicyApi.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').currentBackupPolicyApi.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').currentBackupPolicyApi.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ', first(steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionTimes))]"
 											}
+										}
+									  ],
+									  "visible": "[not(empty(steps('basic').currentBackupPolicyApi))]"
 									},
 									{
 										"name": "backupPoliciesApi",
@@ -846,12 +898,15 @@
 											"visible": "[not(empty(steps('basic').backupPolicy.properties))]",
 											"options": {
 													"icon": "Info",
-													"text": "[concat('Backup Frequency: ', steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').backupPolicy.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ', first(steps('basic').backupPolicy.properties.retentionPolicy.retentionTimes))]"
+													"text": "[concat('Backup Frequency: ', steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').backupPolicy.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ', first(steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionTimes))]"
 											}
 									}								]
 							}
 						],
-						"outputs": {							
+						"outputs": {
+							"updateType": "ProtectedVM",
+							"VmName": "[steps('basic').VmName]",
+							"PolicyName": "[steps('basic').backupPolicy.id]"
 						}
 					}
 				},
@@ -864,17 +919,23 @@
 					},
 					{
 						"key": "properties.Status",
-						"displayName": "Status"
+						"displayName": "VM Status"
 					},
 					{
-						"key": "properties.PrivateIpAddress",
-						"displayName": "Priavte IP",
-						"optional": true
+						"key": "properties.BackupStatus.protectionState",
+						"displayName": "Protection State"
+					},
+					{
+						"key": "properties.BackupStatus.protectionStatus",
+						"displayName": "Protection Status"
+					},
+					{
+						"key": "properties.BackupStatus.policyId",
+						"displayName": "Policy"
 					},
 					{
 						"key": "properties.BackupStatus.lastBackupTime",
-						"displayName": "Last Backup",
-						"optional": true
+						"displayName": "Last Backup"
 					}
 				]
 			}
