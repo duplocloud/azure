@@ -516,18 +516,14 @@
 										"constraints": {
 											"allowedValues": [
 												{
-													"label": "Patch Window",
-													"value": "UpdatePolicies"
-												},
-												{
-													"label": "Backup Policy",
-													"value": "BackupPolicy"
+													"label": "Change Disk Parameters",
+													"value": "UpdateDisk"
 												}
 											],
 											"required": true
 										},
 										"visible": true
-									  },
+									},
 									{
 										"name": "VmId",
 										"label": "Vm ID",
@@ -543,207 +539,43 @@
 										"constraints": {}
 									},
 									{
-										"name": "osType",
-										"label": "OS Type",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValuePath": "properties.OsPlatform",
-										"visible": "[equals(steps('basic').updateComponentDropDown, 'UpdatePolicies')]",
-										"toolTip": "Format of timestamp 2020-10-28T19:00:00"
-									},
-									{
-										"name": "UpdateClassifications",
-										"label": "Linux Update Classifications",
-										"type": "Microsoft.Common.DropDown",
-										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdatePolicies'), empty(steps('basic').osType))]",
-										"defaultValue": "Critical",
-										"constraints": {
-											"allowedValues": [
-												{
-													"label": "Critical",
-													"value": "Critical"
-												},
-												{
-													"label": "Security",
-													"value": "Security"
-												},
-												{
-													"label": "Other",
-													"value": "Other"
-												},
-												{
-													"label": "Unclassified",
-													"value": "Unclassified"
-												}
-											]
-										}
-									},
-									{
-										"name": "WindowsUpdateClassifications",
-										"label": "Windows Update Classifications",
-										"type": "Microsoft.Common.DropDown",
-										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdatePolicies'), equals(steps('basic').osType, 'Windows'))]",
-										"defaultValue": "Critical",
-										"constraints": {
-											"allowedValues": [
-												{
-													"label": "Critical",
-													"value": "Critical"
-												},
-												{
-													"label": "Security",
-													"value": "Security"
-												},
-												{
-													"label": "UpdateRollup",
-													"value": "UpdateRollup"
-												},
-												{
-													"label": "FeaturePack",
-													"value": "FeaturePack"
-												},
-												{
-													"label": "ServicePack",
-													"value": "ServicePack"
-												},
-												{
-													"label": "Definition",
-													"value": "Definition"
-												},
-												{
-													"label": "Tools",
-													"value": "Tools"
-												},
-												{
-													"label": "Updates",
-													"value": "Updates"
-												}
-											]
-										}
-									},
-									{
-										"name": "rebootSetting",
-										"label": "Reboot settings",
-										"type": "Microsoft.Common.DropDown",
-										"visible": "[equals(steps('basic').updateComponentDropDown, 'UpdatePolicies')]",
-										"defaultValue": "IfRequired",
-										"constraints": {
-											"allowedValues": [
-												{
-													"label": "RebootOnly",
-													"value": "RebootOnly"
-												},
-												{
-													"label": "IfRequired",
-													"value": "IfRequired"
-												}
-
-											]
-										}
-									},
-									{
-										"name": "frequency",
-										"label": "Frequency",
-										"visible": "[equals(steps('basic').updateComponentDropDown, 'UpdatePolicies')]",
-										"type": "Microsoft.Common.DropDown",
-										"defaultValue": "OneTime",
-										"constraints": {
-											"allowedValues": [
-												{
-													"label": "OneTime",
-													"value": "OneTime"
-												}
-											]
-										}
-									},
-									{
-										"name": "startTime",
-										"label": "Update on",
-										"visible": "[equals(steps('basic').updateComponentDropDown, 'UpdatePolicies')]",
-										"type": "Microsoft.Common.TextBox",
-										"defaultValue": "2020-10-28T19:00:00",
-										"toolTip": "Format of timestamp 2020-10-28T19:00:00",
-										"constraints": {
-											"required": true
-										}
-									},
-									{
-										"name": "timeZone",
-										"label": "TimeZone",
-										"visible": "[equals(steps('basic').updateComponentDropDown, 'UpdatePolicies')]",
-										"type": "Microsoft.Common.DropDown",
-										"defaultValue": "America/Los_Angeles",
-										"constraints": {
-											"allowedValues": [
-												{
-													"label": "America/Los_Angeles",
-													"value": "America/Los_Angeles"
-												}
-											]
-										}
-									},
-									{
-									  "name": "emptyBackupPolicyInfo",
-									  "type": "Microsoft.Common.InfoBox",
-									  "visible": "[and(equals(steps('basic').updateComponentDropDown, 'BackupPolicy'), empty(steps('basic').currentBackupPolicyApi))]",
-									  "options": {
-										"icon": "Info",
-										"text": "Backup policy is not configured for this VM. Select any policy from the below to attach."
-									  }
-									},
-									{
-										"name": "currentBackupPolicyApi",
+										"name": "vmDetailsApi",
 										"type": "Microsoft.Solutions.ArmApiControl",
 										"request": {
-											"method": "POST",
-											"path":"[concat(steps('basic').VmId, '/ProxyPost?api-version=2018-09-01-preview')]",																					
-											"body": {
-												"BackendUrl": "GetAzureVaultBackupPolicyByVm/<VmName>",
-												"Method": "GET"
-											}
-										}	
-									},
-									{
-											"name": "currentBackupPolicyInfo",
-											"type": "Microsoft.Common.InfoBox",
-											"visible": "[and(equals(steps('basic').updateComponentDropDown, 'BackupPolicy'),not(empty(steps('basic').currentBackupPolicyApi)))]",
-											"toolTip": "Current Backup Policy",
-											"options": {
-													"icon": "Info",
-													"text": "[concat('Backup Frequency: ', steps('basic').currentBackupPolicyApi.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').currentBackupPolicyApi.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').currentBackupPolicyApi.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ', first(steps('basic').currentBackupPolicyApi.properties.retentionPolicy.retentionTimes))]"
-											}
-									},
-									{
-										"name": "backupPoliciesApi",
-										"type": "Microsoft.Solutions.ArmApiControl",
-										"request": {
-											"method": "POST",
-											"path":"[concat(first(split(steps('basic').VmId, '/VirtualMachines')), '/ProxyPost?api-version=2018-09-01-preview')]",																					
-											"body": {
-												"BackendUrl": "GetAzureVaultBackupPoliciesByTenant",
-												"Method": "GET"
-											}
+											"method": "GET",
+											"path":"[concat(steps('basic').VmId, '?api-version=2018-09-01-preview')]"
 										}	
 									},										
 									{
-										"name": "backupPolicy",
+										"name": "vmDisksDropDown",
 										"type": "Microsoft.Common.DropDown",
-										"label": "Select New Backup Policy",
-										"visible": "[equals(steps('basic').updateComponentDropDown, 'BackupPolicy')]",
-										"toolTip": "Choose a backup policy",
+										"label": "Select Disk to Update",
+										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdateDisk'), greater(length(steps('basic').vmDetailsApi.properties.Volumes), 0))]",
+										"toolTip": "Select Disk to Update",
 										"defaultValue": "",
 										"constraints": {
-											"allowedValues": "[map(steps('basic').backupPoliciesApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":', string(item), '}')))]",
+											"allowedValues": "[map(steps('basic').vmDetailsApi.properties.Volumes, (item) => parse(concat('{\"label\":\"', item.Name, '\",\"value\":\"', string(item.Size), '\"}')))]",
 											"required": true
 										}
 									},
 									{
-											"name": "backupPolicyInfo",
+											"name": "vmDisksEmptyInfo",
 											"type": "Microsoft.Common.InfoBox",
-											"visible": "[and(equals(steps('basic').updateComponentDropDown, 'BackupPolicy'), not(empty(steps('basic').backupPolicy.properties)))]",
+											"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdateDisk'), equals(length(steps('basic').vmDetailsApi.properties.Volumes), 0))]",
 											"options": {
 													"icon": "Info",
-													"text": "[concat('Backup Frequency: ', steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').backupPolicy.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ', first(steps('basic').backupPolicy.properties.retentionPolicy.retentionTimes))]"
+													"text": "There are no Data Disks attached"
 											}
+									},
+									{
+										"name": "currentDiskInfo",
+										"type": "Microsoft.Common.InfoBox",
+										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdateDisk'), greater(length(steps('basic').vmDetailsApi.properties.Volumes), 0))]",
+										"toolTip": "Current Backup Policy",
+										"options": {
+												"icon": "Info",
+												"text": "[concat('Current Size: ', string(steps('basic').vmDisksDropDown))]"
+										}
 									}
 								]
 							}
@@ -781,43 +613,134 @@
 						"displayName": "Stop",
 						"path": "VirtualMachines/stopAzureHost",
 						"icon": "Stop"
+					}
+				],
+				"columns": [
+					{
+						"key": "properties.FriendlyName",
+						"displayName": "Full Name"
 					},
 					{
-						"displayName": "Backup Policy",
-						"path": "VirtualMachines/ProxyPost",
-						"icon": "Link",
-						"createUIDefinition": {
-							"$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
-							"handler": "Microsoft.Azure.CreateUIDef",
-							"version": "0.1.2-preview",
-							"parameters": {
-								"basics": [
-									{}
-								],
-								"steps": [
+						"key": "properties.Status",
+						"displayName": "Status"
+					},
+					{
+						"key": "properties.PrivateIpAddress",
+						"displayName": "Priavte IP",
+						"optional": true
+					},
+					{
+						"key": "properties.BackupStatus.lastBackupTime",
+						"displayName": "Last Backup",
+						"optional": true
+					}
+				]
+			}
+		},
+		{
+			"kind": "CustomResources",
+			"properties": {
+				"displayName": "Backup Policies",
+				"version": "1.0.0.0",
+				"resourceType": "VirtualMachines",
+				"editUIDefinition": {
+					"$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"version": "0.1.2-preview",
+					"parameters": {
+						"basics": [
+							{}
+						],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements": [
 									{
-										"name": "storageConfig",
-										"label": "Storage settings",
-										"elements": [
-											{
-												"name": "LgWsName",
-												"label": "Workspace Name",
-												"type": "Microsoft.Common.TextBox",
-												"defaultValuePath": "properties.FriendlyName",
-												"constraints": {}
+										"name": "VmId",
+										"label": "Vm ID",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValuePath": "id",
+										"constraints": {}
+									},
+									{
+										"name": "VmName",
+										"label": "Vm Name",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValuePath": "properties.FriendlyName",
+										"constraints": {}
+									},									
+									{
+									  "name": "emptyBackupPolicyInfo",
+									  "type": "Microsoft.Common.InfoBox",
+									  "visible": "[empty(steps('basic').currentBackupPolicyApi)]",
+									  "options": {
+										"icon": "Info",
+										"text": "Backup policy is not configured for this VM. Select any policy from the below to attach."
+									  }
+									},
+									{
+										"name": "currentBackupPolicyApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat(steps('basic').VmId, '/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"body": {
+												"BackendUrl": "GetAzureVaultBackupPolicyByVm/<VmName>",
+												"Method": "GET"
 											}
-										]
-									}
-								],
-								"outputs": {
-									"storageAccountNamePrefix": "[steps('storageConfig').storageAccounts.prefix]",
-									"storageAccountType": "[steps('storageConfig').storageAccounts.type]",
-									"location": "[location()]",
-									"tagsByResource": "[steps('tags').tagsByResource]"
-								}
+										}	
+									},
+									{
+											"name": "currentBackupPolicyInfo",
+											"type": "Microsoft.Common.InfoBox",
+											"visible": "[not(empty(steps('basic').currentBackupPolicyApi))]",
+											"toolTip": "Current Backup Policy",
+											"options": {
+													"icon": "Info",
+													"text": "[concat('Backup Frequency: ', steps('basic').currentBackupPolicyApi.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').currentBackupPolicyApi.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').currentBackupPolicyApi.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ', first(steps('basic').currentBackupPolicyApi.properties.retentionPolicy.retentionTimes))]"
+											}
+									},
+									{
+										"name": "backupPoliciesApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat(first(split(steps('basic').VmId, '/VirtualMachines')), '/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"body": {
+												"BackendUrl": "GetAzureVaultBackupPoliciesByTenant",
+												"Method": "GET"
+											}
+										}	
+									},										
+									{
+										"name": "backupPolicy",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Select New Backup Policy",
+										"visible": "true",
+										"toolTip": "Choose a backup policy",
+										"defaultValue": "",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').backupPoliciesApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":', string(item), '}')))]",
+											"required": true
+										}
+									},
+									{
+											"name": "backupPolicyInfo",
+											"type": "Microsoft.Common.InfoBox",
+											"visible": "[not(empty(steps('basic').backupPolicy.properties))]",
+											"options": {
+													"icon": "Info",
+													"text": "[concat('Backup Frequency: ', steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').backupPolicy.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ', first(steps('basic').backupPolicy.properties.retentionPolicy.retentionTimes))]"
+											}
+									}								]
 							}
+						],
+						"outputs": {							
 						}
 					}
+				},
+				"commands": [					
 				],
 				"columns": [
 					{
@@ -1079,191 +1002,191 @@
 				]
 			}
 		},
-	{
-		"kind": "CustomResources",
-		"properties": {
-			"displayName": "Scheduled Tasks",
-			"version": "1.0.0.0",
-			"resourceType": "ScheduledTasks",
-			"createUIDefinition": {
-				"handler": "Microsoft.Azure.CreateUIDef",
-				"parameters": {
-					"config": {
-						"isWizard": true
-					},
-					"basics": [],
-					"steps": [
-						{
-							"name": "basic",
-							"label": "Basic",
-							"elements": [
-								{
-									"name": "subscriptionsApi",
-									"type": "Microsoft.Solutions.ArmApiControl",
-									"request": {
-										"method": "GET",
-										"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
-									}
-								},
-								{
-									"name": "subscriptionDropDown",
-									"type": "Microsoft.Common.DropDown",
-									"label": "Subscriptions",
-									"toolTip": "",
-									"constraints": {
-										"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
-										"required": true
-									},
-									"visible": true
-								},
-								{
-									"name": "resourceGroupsApi",
-									"type": "Microsoft.Solutions.ArmApiControl",
-									"request": {
-										"method": "GET",
-										"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
-									}
-								},
-								{
-									"name": "resourceGroupDropDown",
-									"type": "Microsoft.Common.DropDown",
-									"label": "Resource Groups",
-									"toolTip": "",
-									"constraints": {
-										"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duplomgapp-mgr-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duplomgapp-mgr-', ''), '\",\"value\":\"', item.name, '\"}')))]",
-										"required": true
-									},
-									"visible": true
-								},
-								{
-									"name": "vmListApi",
-									"type": "Microsoft.Solutions.ArmApiControl",
-									"request": {
-										"method": "POST",
-										"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
-										"body": {
-											"BackendUrl": "GetAsyncNativeHosts",
-											"Method": "GET"
+		{
+			"kind": "CustomResources",
+			"properties": {
+				"displayName": "Scheduled Tasks",
+				"version": "1.0.0.0",
+				"resourceType": "ScheduledTasks",
+				"createUIDefinition": {
+					"handler": "Microsoft.Azure.CreateUIDef",
+					"parameters": {
+						"config": {
+							"isWizard": true
+						},
+						"basics": [],
+						"steps": [
+							{
+								"name": "basic",
+								"label": "Basic",
+								"elements": [
+									{
+										"name": "subscriptionsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "GET",
+											"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
 										}
-									}	
-								},
-								{
-									"name": "VmName",
-									"type": "Microsoft.Common.DropDown",
-									"label": "Virtual Machine",
-									"toolTip": "Choose one of the Virtual Machine",
-									"constraints": {
-										"allowedValues": "[map(steps('basic').vmListApi.value, (item) => parse(concat('{\"label\":\"', item.FriendlyName, '\",\"value\":\"', item.FriendlyName, '\"}')))]",
-										"required": true
 									},
-									"visible": true
-								},
-								{
-									"name": "TaskType",
-									"label": "Task Action",
-									"type": "Microsoft.Common.DropDown",
-									"defaultValue": 1,
-									"constraints": {
-										"allowedValues": [
-											{
-												"label": "Stop",
-												"value": 1
-											},
-											{
-												"label": "Start",
-												"value": 2
-											},
-											{
-												"label": "Backup",
-												"value": 0
+									{
+										"name": "subscriptionDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Subscriptions",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "resourceGroupsApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "GET",
+											"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
+										}
+									},
+									{
+										"name": "resourceGroupDropDown",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Resource Groups",
+										"toolTip": "",
+										"constraints": {
+											"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duplomgapp-mgr-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duplomgapp-mgr-', ''), '\",\"value\":\"', item.name, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "vmListApi",
+										"type": "Microsoft.Solutions.ArmApiControl",
+										"request": {
+											"method": "POST",
+											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"body": {
+												"BackendUrl": "GetAsyncNativeHosts",
+												"Method": "GET"
 											}
-										]
+										}	
+									},
+									{
+										"name": "VmName",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Virtual Machine",
+										"toolTip": "Choose one of the Virtual Machine",
+										"constraints": {
+											"allowedValues": "[map(steps('basic').vmListApi.value, (item) => parse(concat('{\"label\":\"', item.FriendlyName, '\",\"value\":\"', item.FriendlyName, '\"}')))]",
+											"required": true
+										},
+										"visible": true
+									},
+									{
+										"name": "TaskType",
+										"label": "Task Action",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": 1,
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Stop",
+													"value": 1
+												},
+												{
+													"label": "Start",
+													"value": 2
+												},
+												{
+													"label": "Backup",
+													"value": 0
+												}
+											]
+										}
+									},
+									{
+										"name": "DaysOfWeek",
+										"label": "Days Of Week",
+										"type": "Microsoft.Common.DropDown",
+										"defaultValue": "",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Sunday",
+													"value": "sun"
+												},
+												{
+													"label": "Monday",
+													"value": "mon"
+												},
+												{
+													"label": "Tuesday",
+													"value": "tue"
+												},
+												{
+													"label": "Wednesday",
+													"value": "wed"
+												},												{
+													"label": "Thursday",
+													"value": "thu"
+												},
+												{
+													"label": "Friday",
+													"value": "fri"
+												},
+												{
+													"label": "Saturday",
+													"value": "sat"
+												}
+											]
+										}
+									},
+									{
+										"name": "TimeOfDay",
+										"label": "Time Of Day",
+										"type": "Microsoft.Common.TextBox",
+										"defaultValue": "00:00:00",
+										"toolTip": "Format of time in HH:MM:SS",
+										"constraints": {
+											"required": true
+										}
 									}
-								},
-								{
-									"name": "DaysOfWeek",
-									"label": "Days Of Week",
-									"type": "Microsoft.Common.DropDown",
-									"defaultValue": "",
-									"constraints": {
-										"allowedValues": [
-											{
-												"label": "Sunday",
-												"value": "sun"
-											},
-											{
-												"label": "Monday",
-												"value": "mon"
-											},
-											{
-												"label": "Tuesday",
-												"value": "tue"
-											},
-											{
-												"label": "Wednesday",
-												"value": "wed"
-											},												{
-												"label": "Thursday",
-												"value": "thu"
-											},
-											{
-												"label": "Friday",
-												"value": "fri"
-											},
-											{
-												"label": "Saturday",
-												"value": "sat"
-											}
-										]
-									}
-								},
-								{
-									"name": "TimeOfDay",
-									"label": "Time Of Day",
-									"type": "Microsoft.Common.TextBox",
-									"defaultValue": "00:00:00",
-									"toolTip": "Format of time in HH:MM:SS",
-									"constraints": {
-										"required": true
-									}
-								}
-							]
+								]
+							}
+						],
+						"outputs": {
+							"ComponentId": "[steps('basic').VmName]",
+							"TaskType": "[steps('basic').TaskType]",
+							"Cloud": 2,
+							"TimeOfDay": "[steps('basic').TimeOfDay]",
+							"DaysOfWeek": "[steps('basic').DaysOfWeek]"
 						}
-					],
-					"outputs": {
-						"ComponentId": "[steps('basic').VmName]",
-						"TaskType": "[steps('basic').TaskType]",
-						"Cloud": 2,
-						"TimeOfDay": "[steps('basic').TimeOfDay]",
-						"DaysOfWeek": "[steps('basic').DaysOfWeek]"
 					}
-				}
-			},
-			"commands": [
-			],
-			"columns": [
-				{
-					"key": "name",
-					"displayName": "Name"
 				},
-				{
-					"key": "properties.ComponentId",
-					"displayName": "Virtual Machine"
-				},
-				{
-					"key": "properties.TaskType",
-					"displayName": "Task Type"
-				},
-				{
-					"key": "properties.DaysOfWeek",
-					"displayName": "Days Of Week"
-				},
-				{
-					"key": "properties.TimeOfDay",
-					"displayName": "Time Of Day"
-				}
-			]
+				"commands": [
+				],
+				"columns": [
+					{
+						"key": "name",
+						"displayName": "Name"
+					},
+					{
+						"key": "properties.ComponentId",
+						"displayName": "Virtual Machine"
+					},
+					{
+						"key": "properties.TaskType",
+						"displayName": "Task Type"
+					},
+					{
+						"key": "properties.DaysOfWeek",
+						"displayName": "Days Of Week"
+					},
+					{
+						"key": "properties.TimeOfDay",
+						"displayName": "Time Of Day"
+					}
+				]
+			}
 		}
-	}
 ]
 }
