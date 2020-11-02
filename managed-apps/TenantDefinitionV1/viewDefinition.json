@@ -520,7 +520,7 @@
 						"outputs": {
 							"ArmTemplateDeployment": "true",
 							"properties": {
-								"FriendlyName": {"value": "[steps('basic').name]"},
+								"FriendlyName": {"value": "[concat('duploservices-',replace(steps('basic').resourceGroupDropDown, 'duplomgapp-mgr-', ''), '-', steps('basic').name)]"},
 								"Capacity": {"value": "[steps('basic').type]"},
 								"ImageId": {"value": "[steps('basic').imageid]"},
 								"OsDiskSize": {"value": "[steps('advanced').disksize]"},
