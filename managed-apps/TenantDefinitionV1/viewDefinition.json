@@ -216,12 +216,12 @@
 										"type": "Microsoft.Solutions.ArmApiControl",
 										"request": {
 											"method": "POST",
-											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"path": "[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",
 											"body": {
 												"BackendUrl": "GetAzureTenantSubnets",
 												"Method": "GET"
 											}
-										}	
+										}
 									},
 									{
 										"name": "subnets",
@@ -342,8 +342,7 @@
 																"type": "Microsoft.Common.TextBox",
 																"placeholder": "Name",
 																"constraints": {
-																	"validations": [
-																	]
+																	"validations": []
 																}
 															}
 														}
@@ -365,7 +364,6 @@
 										"defaultValue": false,
 										"constraints": {
 											"allowedValues": [
-
 												{
 													"label": "Skip Backup Policy",
 													"value": false
@@ -383,11 +381,12 @@
 										"type": "Microsoft.Solutions.ArmApiControl",
 										"request": {
 											"method": "POST",
-											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",											"body": {
+											"path": "[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",
+											"body": {
 												"BackendUrl": "GetAzureVaultBackupPoliciesByTenant",
 												"Method": "GET"
 											}
-										}	
+										}
 									},
 									{
 										"name": "backupPolicy",
@@ -413,7 +412,6 @@
 										"defaultValue": false,
 										"constraints": {
 											"allowedValues": [
-
 												{
 													"label": "Skip Patching",
 													"value": false
@@ -469,7 +467,6 @@
 													"label": "IfRequired",
 													"value": "IfRequired"
 												}
-
 											]
 										}
 									},
@@ -520,24 +517,57 @@
 						"outputs": {
 							"ArmTemplateDeployment": "true",
 							"properties": {
-								"FriendlyName": {"value": "[concat('duploservices-',replace(steps('basic').resourceGroupDropDown, 'duplomgapp-mgr-', ''), '-', steps('basic').name)]"},
-								"Capacity": {"value": "[steps('basic').type]"},
-								"ImageId": {"value": "[steps('basic').imageid]"},
-								"OsDiskSize": {"value": "[steps('advanced').disksize]"},
-								"JoinDomain": {"value": "[steps('networking').joinDomain]"},
-								"joinLogAnalyticsWs": {"value": "[steps('networking').joinLogAnalyticsWs]"},
-								"Volumes": {"value": "[steps('advanced').volumes.tags]"},
-								"AllocatedPublicIp": {"value": "[steps('networking').publicip]"},
-								"EncryptDisk": {"value": "[steps('advanced').encryption]"},
-								"UpdateClassifications": {"value": "[if(empty(steps('patching').UpdateClassifications), 'Critical', steps('patching').UpdateClassifications)]"},
-								"rebootSetting": {"value": "[if(empty(steps('patching').rebootSetting), 'IfRequired', steps('patching').rebootSetting)]"},
-								"frequency": {"value": "[if(empty(steps('patching').frequency), 'OneTime', steps('patching').frequency)]"},
-								"startTime": {"value": "[if(empty(steps('patching').startTime), '2021-01-01T02:00:00', steps('patching').startTime)]"},
-								"timeZone": {"value": "[if(empty(steps('patching').UpdateClassifications), 'America/Los_Angeles', steps('patching').UpdateClassifications)]"},
-								"SetPathcing": {"value": "[steps('patching').SetPathcing]"},
-								"BackupPolicyName": {"value": "[if(empty(steps('backup').backupPolicy), 'NA', steps('backup').backupPolicy)]"},
-								"SetBackupPolicy": {"value": "[steps('backup').SetBackupPolicy]"}
-								
+								"FriendlyName": {
+									"value": "[concat('duploservices-',replace(steps('basic').resourceGroupDropDown, 'duplomgapp-mgr-', ''), '-', steps('basic').name)]"
+								},
+								"Capacity": {
+									"value": "[steps('basic').type]"
+								},
+								"ImageId": {
+									"value": "[steps('basic').imageid]"
+								},
+								"OsDiskSize": {
+									"value": "[steps('advanced').disksize]"
+								},
+								"JoinDomain": {
+									"value": "[steps('networking').joinDomain]"
+								},
+								"joinLogAnalyticsWs": {
+									"value": "[steps('networking').joinLogAnalyticsWs]"
+								},
+								"Volumes": {
+									"value": "[steps('advanced').volumes.tags]"
+								},
+								"AllocatedPublicIp": {
+									"value": "[steps('networking').publicip]"
+								},
+								"EncryptDisk": {
+									"value": "[steps('advanced').encryption]"
+								},
+								"UpdateClassifications": {
+									"value": "[if(empty(steps('patching').UpdateClassifications), 'Critical', steps('patching').UpdateClassifications)]"
+								},
+								"rebootSetting": {
+									"value": "[if(empty(steps('patching').rebootSetting), 'IfRequired', steps('patching').rebootSetting)]"
+								},
+								"frequency": {
+									"value": "[if(empty(steps('patching').frequency), 'OneTime', steps('patching').frequency)]"
+								},
+								"startTime": {
+									"value": "[if(empty(steps('patching').startTime), '2021-01-01T02:00:00', steps('patching').startTime)]"
+								},
+								"timeZone": {
+									"value": "[if(empty(steps('patching').UpdateClassifications), 'America/Los_Angeles', steps('patching').UpdateClassifications)]"
+								},
+								"SetPathcing": {
+									"value": "[steps('patching').SetPathcing]"
+								},
+								"BackupPolicyName": {
+									"value": "[if(empty(steps('backup').backupPolicy), 'NA', steps('backup').backupPolicy)]"
+								},
+								"SetBackupPolicy": {
+									"value": "[steps('backup').SetBackupPolicy]"
+								}
 							}
 						}
 					}
@@ -653,9 +683,9 @@
 										"type": "Microsoft.Solutions.ArmApiControl",
 										"request": {
 											"method": "GET",
-											"path":"[concat(steps('basic').VmId, '?api-version=2018-09-01-preview')]"
-										}	
-									},										
+											"path": "[concat(steps('basic').VmId, '?api-version=2018-09-01-preview')]"
+										}
+									},
 									{
 										"name": "vmDisksDropDown",
 										"type": "Microsoft.Common.DropDown",
@@ -689,6 +719,19 @@
 													},
 													"columns": [
 														{
+															"id": "Name",
+															"header": "Name",
+															"width": "1fr",
+															"element": {
+																"name": "dropDown1",
+																"type": "Microsoft.Common.TextBox",
+																"placeholder": "1",
+																"constraints": {
+																	"required": true
+																}
+															}
+														},
+														{
 															"id": "VolumeId",
 															"header": "Volume ID",
 															"width": "1fr",
@@ -718,11 +761,27 @@
 															"header": "Snapshot ID",
 															"width": "1fr",
 															"element": {
-																"type": "Microsoft.Common.TextBox",
-																"placeholder": "Name",
+																"name": "updateDiskVolumeType",
+																"type": "Microsoft.Common.DropDown",
+																"label": "Volume Type",
+																"placeholder": "",
+																"toolTip": "Choose a Component to Update",
 																"constraints": {
-																	"validations": [
-																	]
+																	"allowedValues": [
+																		{
+																			"label": "Standard_LRS",
+																			"value": "Standard_LRS"
+																		},
+																		{
+																			"label": "Premium_LRS",
+																			"value": "Premium_LRS"
+																		},
+																		{
+																			"label": "StandardSSD_LRS",
+																			"value": "StandardSSD_LRS"
+																		}
+																	],
+																	"required": true
 																}
 															}
 														}
@@ -732,13 +791,13 @@
 										]
 									},
 									{
-											"name": "vmDisksEmptyInfo",
-											"type": "Microsoft.Common.InfoBox",
-											"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdateDisk'), equals(length(steps('basic').vmDetailsApi.properties.Volumes), 0))]",
-											"options": {
-													"icon": "Info",
-													"text": "There are no Data Disks attached"
-											}
+										"name": "vmDisksEmptyInfo",
+										"type": "Microsoft.Common.InfoBox",
+										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdateDisk'), equals(length(steps('basic').vmDetailsApi.properties.Volumes), 0))]",
+										"options": {
+											"icon": "Info",
+											"text": "There are no Data Disks attached"
+										}
 									},
 									{
 										"name": "currentDiskInfo",
@@ -746,8 +805,8 @@
 										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdateDisk'), greater(length(steps('basic').vmDetailsApi.properties.Volumes), 0), not(empty(steps('basic').vmDisksDropDown)))]",
 										"toolTip": "Current Backup Policy",
 										"options": {
-												"icon": "Info",
-												"text": "[concat('Current Disk Size: ', string(steps('basic').vmDisksDropDown.Size), 'GB; Volume Type: ',  string(steps('basic').vmDisksDropDown.VolumeType))]"
+											"icon": "Info",
+											"text": "[concat('Current Disk Size: ', string(steps('basic').vmDisksDropDown.Size), 'GB; Volume Type: ',  string(steps('basic').vmDisksDropDown.VolumeType))]"
 										}
 									},
 									{
@@ -756,31 +815,46 @@
 										"type": "Microsoft.Common.TextBox",
 										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdateDisk'), greater(length(steps('basic').vmDetailsApi.properties.Volumes), 0),not(empty(steps('basic').vmDisksDropDown)))]",
 										"defaultValue": "",
-										"constraints": {}
+										"constraints": {
+											"required": true
+										}
+									},
+									{
+										"name": "updateDiskVolumeType",
+										"type": "Microsoft.Common.DropDown",
+										"label": "Volume Type",
+										"placeholder": "",
+										"toolTip": "Choose a Component to Update",
+										"constraints": {
+											"allowedValues": [
+												{
+													"label": "Standard_LRS",
+													"value": "Standard_LRS"
+												},
+												{
+													"label": "Premium_LRS",
+													"value": "Premium_LRS"
+												},
+												{
+													"label": "StandardSSD_LRS",
+													"value": "StandardSSD_LRS"
+												}
+											],
+											"required": true
+										},
+										"visible": "[and(equals(steps('basic').updateComponentDropDown, 'UpdateDisk'), greater(length(steps('basic').vmDetailsApi.properties.Volumes), 0),not(empty(steps('basic').vmDisksDropDown)))]"
 									}
 								]
 							}
 						],
 						"outputs": {
 							"updateType": "[steps('basic').updateComponentDropDown]",
-							"VmName": "[steps('basic').VmName]",
-							"properties": {
-								"updateConfiguration": {
-									"linux": {
-										"includedPackageClassifications": "[steps('basic').UpdateClassifications]",
-										"rebootSetting": "[steps('basic').rebootSetting]"
-									},
-									"windows": {
-										"includedUpdateClassifications": "[steps('basic').WindowsUpdateClassifications]",
-										"rebootSetting": "[steps('basic').rebootSetting]"
-									}
-								},
-								"scheduleInfo": {
-									"frequency": "[steps('basic').frequency]",
-									"startTime": "[concat(steps('basic').startTime, '+00:00')]",
-									"timeZone": "[steps('basic').timeZone]"
-								}
-							}
+							"FriendlyName": "[steps('basic').VmName]",
+							"Name": "[steps('basic').vmDisksDropDown.Name]",
+							"VolumeId": "[steps('basic').vmDisksDropDown.VolumeId]",
+							"Size": "[int(steps('basic').updateDiskSize)]",
+							"VolumeType": "[steps('basic').updateDiskVolumeType]",
+							"Volumes": "[steps('basic').newDataDisks.tags]"
 						}
 					}
 				},
@@ -850,50 +924,58 @@
 										"type": "Microsoft.Common.TextBox",
 										"defaultValuePath": "properties.FriendlyName",
 										"constraints": {}
-									},									
+									},
 									{
-									  "name": "emptyBackupPolicyInfo",
-									  "type": "Microsoft.Common.InfoBox",
-									  "visible": "[empty(steps('basic').currentBackupPolicyApi)]",
-									  "options": {
-										"icon": "Info",
-										"text": "Backup policy is not configured for this VM. Select any policy from the below to attach."
-									  }
+										"name": "emptyBackupPolicyInfo",
+										"type": "Microsoft.Common.InfoBox",
+										"visible": "[empty(steps('basic').currentBackupPolicyApi)]",
+										"options": {
+											"icon": "Info",
+											"text": "Backup policy is not configured for this VM. Select any policy from the below to attach."
+										}
 									},
 									{
 										"name": "currentBackupPolicyApi",
 										"type": "Microsoft.Solutions.ArmApiControl",
 										"request": {
 											"method": "POST",
-											"path":"[concat(steps('basic').VmId, '/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"path": "[concat(steps('basic').VmId, '/ProxyPost?api-version=2018-09-01-preview')]",
 											"body": {
 												"BackendUrl": "GetAzureVaultBackupPolicyByVm/<VmName>",
 												"Method": "GET"
 											}
-										}	
+										}
 									},
 									{
-											"name": "currentBackupPolicyInfo",
-											"type": "Microsoft.Common.InfoBox",
-											"visible": "[not(empty(steps('basic').currentBackupPolicyApi))]",
-											"toolTip": "Current Backup Policy",
-											"options": {
+										"name": "currentpolicysection",
+										"type": "Microsoft.Common.Section",
+										"label": "Current Backup Policy",
+										"elements": [
+											{
+												"name": "currentBackupPolicyInfo",
+												"type": "Microsoft.Common.InfoBox",
+												"visible": "[not(empty(steps('basic').currentBackupPolicyApi))]",
+												"toolTip": "Current Backup Policy",
+												"options": {
 													"icon": "Info",
-													"text": "[concat('Backup Frequency: ', steps('basic').currentBackupPolicyApi.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').currentBackupPolicyApi.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').currentBackupPolicyApi.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ', first(steps('basic').currentBackupPolicyApi.properties.retentionPolicy.retentionTimes))]"
+													"text": "[concat('Backup Frequency: ', steps('basic').currentBackupPolicyApi.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').currentBackupPolicyApi.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').currentBackupPolicyApi.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ', first(steps('basic').currentBackupPolicyApi.properties.retentionPolicy.dailySchedule.retentionTimes))]"
+												}
 											}
+										],
+										"visible": "[not(empty(steps('basic').currentBackupPolicyApi))]"
 									},
 									{
 										"name": "backupPoliciesApi",
 										"type": "Microsoft.Solutions.ArmApiControl",
 										"request": {
 											"method": "POST",
-											"path":"[concat(first(split(steps('basic').VmId, '/VirtualMachines')), '/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"path": "[concat(first(split(steps('basic').VmId, '/VirtualMachines')), '/ProxyPost?api-version=2018-09-01-preview')]",
 											"body": {
 												"BackendUrl": "GetAzureVaultBackupPoliciesByTenant",
 												"Method": "GET"
 											}
-										}	
-									},										
+										}
+									},
 									{
 										"name": "backupPolicy",
 										"type": "Microsoft.Common.DropDown",
@@ -907,22 +989,25 @@
 										}
 									},
 									{
-											"name": "backupPolicyInfo",
-											"type": "Microsoft.Common.InfoBox",
-											"visible": "[not(empty(steps('basic').backupPolicy.properties))]",
-											"options": {
-													"icon": "Info",
-													"text": "[concat('Backup Frequency: ', steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').backupPolicy.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ', first(steps('basic').backupPolicy.properties.retentionPolicy.retentionTimes))]"
-											}
-									}								]
+										"name": "backupPolicyInfo",
+										"type": "Microsoft.Common.InfoBox",
+										"visible": "[not(empty(steps('basic').backupPolicy.properties))]",
+										"options": {
+											"icon": "Info",
+											"text": "[concat('Backup Frequency: ', steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunFrequency, ' at ', first(steps('basic').backupPolicy.properties.schedulePolicy.scheduleRunTimes), ' ', steps('basic').backupPolicy.properties.timeZone, ' ; ' , 'Retention Range: ',  string(steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.count), ' ', steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionDuration.durationType, ' ; ' , 'Retention of daily backup point: ', first(steps('basic').backupPolicy.properties.retentionPolicy.dailySchedule.retentionTimes))]"
+										}
+									}
+								]
 							}
 						],
-						"outputs": {							
+						"outputs": {
+							"updateType": "ProtectedVM",
+							"VmName": "[steps('basic').VmName]",
+							"PolicyName": "[steps('basic').backupPolicy.id]"
 						}
 					}
 				},
-				"commands": [					
-				],
+				"commands": [],
 				"columns": [
 					{
 						"key": "properties.FriendlyName",
@@ -930,17 +1015,23 @@
 					},
 					{
 						"key": "properties.Status",
-						"displayName": "Status"
+						"displayName": "VM Status"
 					},
 					{
-						"key": "properties.PrivateIpAddress",
-						"displayName": "Priavte IP",
-						"optional": true
+						"key": "properties.BackupStatus.protectionState",
+						"displayName": "Protection State"
+					},
+					{
+						"key": "properties.BackupStatus.protectionStatus",
+						"displayName": "Protection Status"
+					},
+					{
+						"key": "properties.BackupStatus.policyId",
+						"displayName": "Policy"
 					},
 					{
 						"key": "properties.BackupStatus.lastBackupTime",
-						"displayName": "Last Backup",
-						"optional": true
+						"displayName": "Last Backup"
 					}
 				]
 			}
@@ -1006,12 +1097,12 @@
 										"type": "Microsoft.Solutions.ArmApiControl",
 										"request": {
 											"method": "POST",
-											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"path": "[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",
 											"body": {
 												"BackendUrl": "GetAsyncNativeHosts",
 												"Method": "GET"
 											}
-										}	
+										}
 									},
 									{
 										"name": "VmName",
@@ -1098,7 +1189,6 @@
 													"label": "IfRequired",
 													"value": "IfRequired"
 												}
-
 											]
 										}
 									},
@@ -1161,8 +1251,7 @@
 						}
 					}
 				},
-				"commands": [
-				],
+				"commands": [],
 				"columns": [
 					{
 						"key": "name",
@@ -1244,12 +1333,12 @@
 										"type": "Microsoft.Solutions.ArmApiControl",
 										"request": {
 											"method": "POST",
-											"path":"[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",																					
+											"path": "[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",
 											"body": {
 												"BackendUrl": "GetAsyncNativeHosts",
 												"Method": "GET"
 											}
-										}	
+										}
 									},
 									{
 										"name": "VmName",
@@ -1306,7 +1395,8 @@
 												{
 													"label": "Wednesday",
 													"value": "wed"
-												},												{
+												},
+												{
 													"label": "Thursday",
 													"value": "thu"
 												},
@@ -1343,8 +1433,7 @@
 						}
 					}
 				},
-				"commands": [
-				],
+				"commands": [],
 				"columns": [
 					{
 						"key": "name",
@@ -1369,5 +1458,5 @@
 				]
 			}
 		}
-]
+	]
 }
