@@ -2,6 +2,12 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+	"infraName": {
+          "type": "string",
+          "metadata": {
+              "description": "The name of the infrastructure."
+          }
+      },
       "location": {
           "type": "string",
           "defaultValue": "eastus",
@@ -57,64 +63,64 @@
                 {
                     "name": "ProxyPost",
                     "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRpAtRoot"
+                    "endpoint": "[concat('https://incloud.duplocloud.net/InvokeAzureInfraRpAtRoot', '?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002&infra_name=', parameters('infraName'))]"
                 },
                 {
                     "name": "LogAnalytics/ProxyPost",
                     "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+                    "endpoint": "[concat('https://incloud.duplocloud.net/InvokeAzureInfraRp', '?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002&infra_name=', parameters('infraName'))]"
                 }
             ],
             "resourceTypes": [
                 {
                     "name": "Infrastructure",
                     "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+                    "endpoint": "[concat('https://incloud.duplocloud.net/InvokeAzureInfraRp', '?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002&infra_name=', parameters('infraName'))]"
                 },
                 {
                     "name": "Subnet",
                     "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+                    "endpoint": "[concat('https://incloud.duplocloud.net/InvokeAzureInfraRp', '?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002&infra_name=', parameters('infraName'))]"
                 },
                 {
                     "name": "NSGRule",
                     "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+                    "endpoint": "[concat('https://incloud.duplocloud.net/InvokeAzureInfraRp', '?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002&infra_name=', parameters('infraName'))]"
                 },
                 {
                     "name": "VaultBackupPolicies",
                     "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+                    "endpoint": "[concat('https://incloud.duplocloud.net/InvokeAzureInfraRp', '?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002&infra_name=', parameters('infraName'))]"
                 },
                 {
                     "name": "Images",
                     "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+                    "endpoint": "[concat('https://incloud.duplocloud.net/InvokeAzureInfraRp', '?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002&infra_name=', parameters('infraName'))]"
                 },
                 {
                     "name": "Certificates",
                     "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+                    "endpoint": "[concat('https://incloud.duplocloud.net/InvokeAzureInfraRp', '?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002&infra_name=', parameters('infraName'))]"
                 },
                 {
                     "name": "PlanConfigs",
                     "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+                    "endpoint": "[concat('https://incloud.duplocloud.net/InvokeAzureInfraRp', '?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002&infra_name=', parameters('infraName'))]"
                 },
                 {
                     "name": "Tenant",
                     "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+                    "endpoint": "[concat('https://incloud.duplocloud.net/InvokeAzureInfraRp', '?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002&infra_name=', parameters('infraName'))]"
                 },
                 {
                     "name": "LogAnalytics",
                     "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+                    "endpoint": "[concat('https://incloud.duplocloud.net/InvokeAzureInfraRp', '?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002&infra_name=', parameters('infraName'))]"
                 },
                 {
                     "name": "VaultConfig",
                     "routingType": "Proxy",
-                    "endpoint": "https://incloud.duplocloud.net/InvokeAzureInfraRp"
+                    "endpoint": "[concat('https://incloud.duplocloud.net/InvokeAzureInfraRp', '?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002&infra_name=', parameters('infraName'))]"
                 }
             ]
         }

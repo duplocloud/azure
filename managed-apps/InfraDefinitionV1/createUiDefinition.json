@@ -17,11 +17,43 @@
 				"bladeTitle": "Infrastructure Settings",
 				"elements": [
 					{
+						"name": "newinfra",
+						"type": "Microsoft.Common.DropDown",
+						"label": "New Infrastructure",
+						"placeholder": "",
+						"toolTip": "",
+						"constraints": {
+							"allowedValues": [
+								{
+									"label": "No",
+									"value": false
+								},
+								{
+									"label": "Yes",
+									"value": true
+								}
+							],
+							"required": true
+						},
+						"visible": true
+					},
+					{
+						"name": "infraname",
+						"type": "Microsoft.Common.TextBox",
+						"label": "Infrastructure Name",
+						"toolTip": "",
+						"placeholder": "Infrastructure Name",
+						"visible": true,
+						"constraints": {
+							"required": true
+						}
+					},
+					{
 						"name": "vnetCidr",
 						"type": "Microsoft.Common.TextBox",
 						"label": "VNET CIDR",
 						"toolTip": "10.50.0.0/16",
-						"visible": true,
+						"visible": "[steps('infrastructureSettings').newinfra]",
 						"constraints": {
 							"required": true
 						}
@@ -137,7 +169,7 @@
 								}
 							}	
 						],
-						"visible": true
+						"visible": "[steps('infrastructureSettings').newinfra]"
 					},
 					{
 						"name": "loganalyticsws",
@@ -158,7 +190,7 @@
 							],
 							"required": true
 						},
-						"visible": true
+						"visible": "[steps('infrastructureSettings').newinfra]"
 					},
 					{
 						"name": "vaultconfig",
@@ -179,13 +211,14 @@
 							],
 							"required": true
 						},
-						"visible": true
+						"visible": "[steps('infrastructureSettings').newinfra]"
 					}
 				]
 			}
 		],
 		"outputs": {
 			"subscriptionId": "[subscription().subscriptionId]",
+			"infraName": "[steps('infrastructureSettings').infraname]",
 			"vnetCidr": "[steps('infrastructureSettings').vnetCidr]",
 			"Subnets": "[steps('infrastructureSettings').subnetSection.subnet]",
 			"loganalyticsws": "[steps('infrastructureSettings').loganalyticsws]",
