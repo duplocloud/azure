@@ -1,69 +1,68 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "location": {
-            "type": "string",
-            "defaultValue": "eastus",
-            "metadata": {
-                "description": "The location for the resources."
-            }
-        }
-    },
-    "resources": [
-        {
-            "apiVersion": "2018-09-01-preview",
-            "type": "Microsoft.CustomProviders/resourceProviders",
-            "name": "public",
-            "location": "[parameters('location')]",
-            "properties": {
-                "actions": [
-                    {
-                        "name": "ProxyPost",
-                        "routingType": "Proxy",
-                        "endpoint": "https://incloud.duplocloud.net/InvokeAzureRpAtRoot"
-                    },
-                    {
-                        "name": "VirtualMachines/ProxyPost",
-                        "routingType": "Proxy",
-                        "endpoint": "https://incloud.duplocloud.net/InvokeAzureRp"
-                    },
-                    {
-                        "name": "VirtualMachines/startAzureHost",
-                        "routingType": "Proxy",
-                        "endpoint": "https://incloud.duplocloud.net/InvokeAzureRp"
-                    },
-                    {
-                        "name": "VirtualMachines/stopAzureHost",
-                        "routingType": "Proxy",
-                        "endpoint": "https://incloud.duplocloud.net/InvokeAzureRp"
-                    }
-                ],
-                "resourceTypes": [
-                    {
-                        "name": "VirtualMachines",
-                        "routingType": "Proxy",
-                        "endpoint": "https://incloud.duplocloud.net/InvokeAzureRp"
-                    },
-                    {
-                        "name": "UpdatePolicies",
-                        "routingType": "Proxy",
-                        "endpoint": "https://incloud.duplocloud.net/InvokeAzureRp"
-                    },
-                    {
-                        "name": "ProtectedVM",
-                        "routingType": "Proxy",
-                        "endpoint": "https://incloud.duplocloud.net/InvokeAzureRp"
-                    },
-                    {
-                        "name": "ScheduledTasks",
-                        "routingType": "Proxy",
-                        "endpoint": "https://incloud.duplocloud.net/InvokeAzureRp"
-                    }
-                ]
-            }
-        }
-    ],
-    "outputs": {
-    }
-  } 
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"location": {
+			"type": "string",
+			"defaultValue": "eastus",
+			"metadata": {
+				"description": "The location for the resources."
+			}
+		}
+	},
+	"resources": [
+		{
+			"apiVersion": "2018-09-01-preview",
+			"type": "Microsoft.CustomProviders/resourceProviders",
+			"name": "public",
+			"location": "[parameters('location')]",
+			"properties": {
+				"actions": [
+					{
+						"name": "ProxyPost",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureRpAtRoot?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002"
+					},
+					{
+						"name": "VirtualMachines/ProxyPost",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureRp?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002"
+					},
+					{
+						"name": "VirtualMachines/startAzureHost",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureRp?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002"
+					},
+					{
+						"name": "VirtualMachines/stopAzureHost",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureRp?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002"
+					}
+				],
+				"resourceTypes": [
+					{
+						"name": "VirtualMachines",
+						"routingType": "Proxy",
+						"endpoint": "[concat('https://incloud.duplocloud.net/InvokeAzureRp', parameters('applicationResourceName'),'?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002')]"
+					},
+					{
+						"name": "UpdatePolicies",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureRp?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002"
+					},
+					{
+						"name": "ProtectedVM",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureRp?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002"
+					},
+					{
+						"name": "ScheduledTasks",
+						"routingType": "Proxy",
+						"endpoint": "https://incloud.duplocloud.net/InvokeAzureRp?auth_token=6c49159c-1f87-11eb-adc1-0242ac120002"
+					}
+				]
+			}
+		}
+	],
+	"outputs": {}
+}

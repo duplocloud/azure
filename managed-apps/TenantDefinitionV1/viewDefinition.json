@@ -33,42 +33,18 @@
 								"label": "Basic",
 								"elements": [
 									{
-										"name": "subscriptionsApi",
-										"type": "Microsoft.Solutions.ArmApiControl",
-										"request": {
-											"method": "GET",
-											"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
-										}
-									},
-									{
 										"name": "subscriptionDropDown",
-										"type": "Microsoft.Common.DropDown",
+										"type": "Microsoft.Common.TextBox",
 										"label": "Subscriptions",
-										"toolTip": "",
-										"constraints": {
-											"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
-											"required": true
-										},
-										"visible": true
-									},
-									{
-										"name": "resourceGroupsApi",
-										"type": "Microsoft.Solutions.ArmApiControl",
-										"request": {
-											"method": "GET",
-											"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
-										}
+										"defaultValue": "<SUBSCRIPTION_ID>",
+										"visible": false
 									},
 									{
 										"name": "resourceGroupDropDown",
-										"type": "Microsoft.Common.DropDown",
+										"type": "Microsoft.Common.TextBox",
 										"label": "Resource Groups",
-										"toolTip": "",
-										"constraints": {
-											"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duplomgapp-mgr-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duplomgapp-mgr-', ''), '\",\"value\":\"', item.name, '\"}')))]",
-											"required": true
-										},
-										"visible": true
+										"defaultValue": "<RESOURCEGROUP_ID>",
+										"visible": false
 									},
 									{
 										"name": "name",
@@ -216,7 +192,7 @@
 										"type": "Microsoft.Solutions.ArmApiControl",
 										"request": {
 											"method": "POST",
-											"path": "[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",
+											"path": "[concat('/subscriptions/','<SUBSCRIPTION_ID>', '/resourceGroups/', '<RESOURCEGROUP_ID>', '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",
 											"body": {
 												"BackendUrl": "GetAzureTenantSubnets",
 												"Method": "GET"
@@ -381,7 +357,7 @@
 										"type": "Microsoft.Solutions.ArmApiControl",
 										"request": {
 											"method": "POST",
-											"path": "[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",
+											"path": "[concat('/subscriptions/','<SUBSCRIPTION_ID>', '/resourceGroups/', '<RESOURCEGROUP_ID>', '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",
 											"body": {
 												"BackendUrl": "GetAzureVaultBackupPoliciesByTenant",
 												"Method": "GET"
@@ -518,7 +494,7 @@
 							"ArmTemplateDeployment": "true",
 							"properties": {
 								"FriendlyName": {
-									"value": "[concat('duploservices-',replace(steps('basic').resourceGroupDropDown, 'duplomgapp-mgr-', ''), '-', steps('basic').name)]"
+									"value": "[concat('duploservices-',replace('<RESOURCEGROUP_ID>', 'duplomgapp-mgr-', ''), '-', steps('basic').name)]"
 								},
 								"Capacity": {
 									"value": "[steps('basic').type]"
@@ -1055,49 +1031,25 @@
 								"label": "Basic",
 								"elements": [
 									{
-										"name": "subscriptionsApi",
-										"type": "Microsoft.Solutions.ArmApiControl",
-										"request": {
-											"method": "GET",
-											"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
-										}
-									},
-									{
 										"name": "subscriptionDropDown",
-										"type": "Microsoft.Common.DropDown",
+										"type": "Microsoft.Common.TextBox",
 										"label": "Subscriptions",
-										"toolTip": "",
-										"constraints": {
-											"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
-											"required": true
-										},
-										"visible": true
-									},
-									{
-										"name": "resourceGroupsApi",
-										"type": "Microsoft.Solutions.ArmApiControl",
-										"request": {
-											"method": "GET",
-											"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
-										}
+										"defaultValue": "<SUBSCRIPTION_ID>",
+										"visible": false
 									},
 									{
 										"name": "resourceGroupDropDown",
-										"type": "Microsoft.Common.DropDown",
+										"type": "Microsoft.Common.TextBox",
 										"label": "Resource Groups",
-										"toolTip": "",
-										"constraints": {
-											"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duplomgapp-mgr-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duplomgapp-mgr-', ''), '\",\"value\":\"', item.name, '\"}')))]",
-											"required": true
-										},
-										"visible": true
+										"defaultValue": "<RESOURCEGROUP_ID>",
+										"visible": false
 									},
 									{
 										"name": "vmListApi",
 										"type": "Microsoft.Solutions.ArmApiControl",
 										"request": {
 											"method": "POST",
-											"path": "[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",
+											"path": "[concat('/subscriptions/','<SUBSCRIPTION_ID>', '/resourceGroups/', '<RESOURCEGROUP_ID>', '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",
 											"body": {
 												"BackendUrl": "GetAsyncNativeHosts",
 												"Method": "GET"
@@ -1291,49 +1243,25 @@
 								"label": "Basic",
 								"elements": [
 									{
-										"name": "subscriptionsApi",
-										"type": "Microsoft.Solutions.ArmApiControl",
-										"request": {
-											"method": "GET",
-											"path": "[concat('subscriptions', '?api-version=2020-01-01')]"
-										}
-									},
-									{
 										"name": "subscriptionDropDown",
-										"type": "Microsoft.Common.DropDown",
+										"type": "Microsoft.Common.TextBox",
 										"label": "Subscriptions",
-										"toolTip": "",
-										"constraints": {
-											"allowedValues": "[map(steps('basic').subscriptionsApi.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.subscriptionId, '\"}')))]",
-											"required": true
-										},
-										"visible": true
-									},
-									{
-										"name": "resourceGroupsApi",
-										"type": "Microsoft.Solutions.ArmApiControl",
-										"request": {
-											"method": "GET",
-											"path": "[concat('subscriptions/', steps('basic').subscriptionDropDown, '/resourcegroups?api-version=2020-06-01')]"
-										}
+										"defaultValue": "<SUBSCRIPTION_ID>",
+										"visible": false
 									},
 									{
 										"name": "resourceGroupDropDown",
-										"type": "Microsoft.Common.DropDown",
+										"type": "Microsoft.Common.TextBox",
 										"label": "Resource Groups",
-										"toolTip": "",
-										"constraints": {
-											"allowedValues": "[map(filter(steps('basic').resourceGroupsApi.value, (item) => startsWith(item.name, 'duplomgapp-mgr-')), (item) => parse(concat('{\"label\":\"', replace(item.name, 'duplomgapp-mgr-', ''), '\",\"value\":\"', item.name, '\"}')))]",
-											"required": true
-										},
-										"visible": true
+										"defaultValue": "<RESOURCEGROUP_ID>",
+										"visible": false
 									},
 									{
 										"name": "vmListApi",
 										"type": "Microsoft.Solutions.ArmApiControl",
 										"request": {
 											"method": "POST",
-											"path": "[concat('/subscriptions/',steps('basic').subscriptionDropDown, '/resourceGroups/', steps('basic').resourceGroupDropDown, '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",
+											"path": "[concat('/subscriptions/','<SUBSCRIPTION_ID>', '/resourceGroups/', '<RESOURCEGROUP_ID>', '/providers/Microsoft.CustomProviders/resourceProviders/public/ProxyPost?api-version=2018-09-01-preview')]",
 											"body": {
 												"BackendUrl": "GetAsyncNativeHosts",
 												"Method": "GET"
